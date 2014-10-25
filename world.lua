@@ -9,6 +9,10 @@ c = require "constants"
 
 Tile = require "entities.tile"
 
+-- TODO: Decide if these should be
+--       A. In the World class itself, or
+--       B. A constant (in 'constants')
+--
 local HEX_DRAW_BASE, HEX_DRAW_SELECTED, HEX_DRAW_CONTENTS = 1, 2, 3
 
 local HEX_COLOR_BLACK = {30, 30, 30 }
@@ -20,13 +24,21 @@ local HEX_BORDER_WIDTH_SELECTED = 3
 
 local TILE_RADIUS = 48
 
+
+--
+-- WORLD class
+--
+-- Contains a grid of the tile objects
+-- Handles all interactions with the world
+--     - selection, movement
+--     - effects
+--     - relay placement/update
+--
 World = Class{
     init = function( self, width, height )
-        self.width = width
-        self.height = height
+        self.width = width      -- Width of grid
+        self.height = height    -- Height of grid
 	    self.hexGrid = HXM.createRectGrid(width, height, 0)
-
-        self.hexGrid["grid"][1][1] = {color=HEX_COLOR_BLACK, selected = true }
 
         -- TODO: Fancy generation things
         -- START FANCY DEBUG TIME
@@ -48,6 +60,15 @@ World = Class{
         self.hexGrid.grid[cy][cx] = obj
     end,
 
+
+    --
+    -- DRAW function
+    --
+    -- Draws the board. The following is the order of render:
+    --    1. Draw background and base hexagon outlines
+    --    2. Draw boundary hexagons
+    --    3. Draw selected hexagons
+    --    4. Draw hexagon contents
     draw = function( self )
         love.graphics.setColor(255, 255, 255)
         love.graphics.setLineWidth(1)
@@ -55,20 +76,37 @@ World = Class{
         -- Draw base grid and backgrounds
         HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_BASE})
 
+        -- Draw boundary grid
+        -- TODO
+
         -- Draw selected grids
         HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_SELECTED})
 
-        -- Draw contents (TODO)
+        -- Draw contents
         HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_CONTENTS})
 
     end,
 
+
+    --
+    -- DRAW HEXAGON function
+    --
+    -- Draw the given hexagon
+    --
+    -- This is a HORRIBLY overridden function that really should be cut into
+    -- smaller pieces rather than passing a 'mode' as an arg
+    -- TODO: Do this
+    --
     drawHexagon = function(hexCoords, obj, args)
 
+        -- Leave if we find an empty tile
+        --
         if obj == 0 then
             return
         end
 
+        -- Draw the base hex grid
+        --
         if args.mode == HEX_DRAW_BASE then
             -- Draw the background
             local vertices = HXM.getHexVertices(TILE_RADIUS, hexCoords.x, hexCoords.y)
@@ -92,6 +130,8 @@ World = Class{
                                              vertices[5].x, vertices[5].y,
                                              vertices[6].x, vertices[6].y)
 
+        -- Draw the selected hexagons
+        --
         elseif args.mode == HEX_DRAW_SELECTED then
 
             -- Draw only if we have the tile selected
@@ -110,11 +150,23 @@ World = Class{
                                                  vertices[5].x, vertices[5].y,
                                                  vertices[6].x, vertices[6].y)
             end
+
+        -- Draw hexagon contents
+        --
+        -- Relies on Tile:draw(x,y)
+        --
         elseif args.mode == HEX_DRAW_CONTENTS then
             obj:draw(hexCoords.x, hexCoords.y)
         end
     end,
 
+
+    --
+    -- SELECT TILE function
+    --
+    -- Given a world x and y value, find the correct
+    -- hexagon index in self.hexGrid and select it
+    --
     selectTile = function(self, px, py)
 
         -- From world coordinates to hex coordinates
@@ -140,4 +192,5 @@ World = Class{
 }
 
 
+-- Return the world object
 return World
