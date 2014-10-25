@@ -6,6 +6,7 @@
 --
 
 Class = require "hump.class"
+local c = require "constants"
 
 
 --
@@ -14,9 +15,9 @@ Class = require "hump.class"
 -- Will be inherited to different tile types (asteroids, voids, planets, etc)
 --
 Tile = Class{
-    init = function( self, pos, img )
-        self.pos = pos
-        self.img = img
+    init = function( self )
+        self.selected = false
+        self.color = c.Colors.HEX_BLACK
     end
 }
 

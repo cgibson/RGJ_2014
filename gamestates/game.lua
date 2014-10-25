@@ -3,7 +3,7 @@ local Gamestate = require "hump.gamestate"
 local Camera = require "hump.camera"
 
 local World = require "world"
-require "constants"
+local c = require "constants"
 
 -- Game gamestate object
 local Game = {}
@@ -48,9 +48,9 @@ end
 function Game:mousepressed( x, y, mouse )
     self.mouse_drag = true
 
-    if mouse == MOUSE_BUTTON_LEFT then
+    if mouse == c.MOUSE_BUTTON_LEFT then
 
-    elseif mouse == MOUSE_BUTTON_RIGHT then
+    elseif mouse == c.MOUSE_BUTTON_RIGHT then
         self.camera_moving = true
         self.mouse_last_pos = {x, y}
     end
@@ -60,9 +60,11 @@ end
 function Game:mousereleased( x, y, mouse )
     self.mouse_drag = false
 
-    if mouse == MOUSE_BUTTON_LEFT then
-        self.world:selectTile(x, y)
-    elseif mouse == MOUSE_BUTTON_RIGHT then
+    if mouse == c.MOUSE_BUTTON_LEFT then
+        -- Convert screen coordinates to world coordinates
+        wx, wy = self.camera:worldCoords(x, y)
+        self.world:selectTile(wx, wy)
+    elseif mouse == c.MOUSE_BUTTON_RIGHT then
         self.camera_moving = false
     end
 end

@@ -5,6 +5,8 @@
 Class = require "hump.class"
 HXM = require "HexaMoon.HexaMoon"
 
+Tile = require "tile"
+
 local HEX_DRAW_BASE, HEX_DRAW_SELECTED = 1, 2
 
 local HEX_COLOR_BLACK = {30, 30, 30 }
@@ -23,18 +25,20 @@ World = Class{
         self.hexGrid["grid"][1][1] = {color=HEX_COLOR_BLACK, selected = true }
 
         -- FANCY DEBUG TIME
-        self:setTile( 1, 1, {color=HEX_COLOR_BLACK, selected=false} )
-        self:setTile( 2, 1, {color=HEX_COLOR_BLACK, selected=false} )
-        self:setTile( 3, 1, {color=HEX_COLOR_BLACK, selected=false} )
-        self:setTile( 2, 2, {color=HEX_COLOR_BLACK, selected=true} )
-        self:setTile( 2, 3, {color=HEX_COLOR_BLACK, selected=false} )
+        self:setTile( 1, 1, Tile() )
+        self:setTile( 2, 1, Tile() )
+        self:setTile( 3, 1, Tile() )
+        self:setTile( 4, 1, Tile() )
+        self:setTile( 1, 2, Tile() )
+        self:setTile( 1, 3, Tile() )
+        self:setTile( 1, 4, Tile() )
 
         self.tile_radius = 48
         self.offset = {0, 0}
     end,
 
     setTile = function( self, cx, cy, obj )
-        self.hexGrid.grid[cx][cy] = obj
+        self.hexGrid.grid[cy][cx] = obj
     end,
 
     draw = function( self )
@@ -98,9 +102,18 @@ World = Class{
     end,
 
     selectTile = function(self, px, py)
-        print("searching for tile: (", px, ", ", py, ")")
         cx, cy = HXM.getHexFromPixel(px, py, self.tile_radius, self.offset[1], self.offset[2])
         print("you selected tile (", cx, ", ", cy, ")")
+
+        cx = cx+1
+        cy = cy+1
+
+        if self.hexGrid.grid[cy][cx] == 0 then
+            print("You selected an empty tile you doofus!")
+            return
+        end
+
+        self.hexGrid.grid[cy][cx].selected = (self.hexGrid.grid[cy][cx].selected == false)
     end
 }
 
