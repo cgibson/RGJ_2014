@@ -5,6 +5,7 @@
 --
 Gamestate = require "hump.gamestate"
 local Menu = require "gamestates.menu"
+local Game = require "gamestates.game"
 
 -- Gamestate object
 local Intro = {}
@@ -17,7 +18,8 @@ local Intro = {}
 -- but is guaranteed to run before we enter the gamestate
 --
 function Intro:init()
-    self.wait_time = 5   -- show screen for 5 seconds
+    self.wait_time = 1      -- show screen for 5 seconds
+    self.do_intro = false   -- whether or not to skip the intro
 end
 
 
@@ -50,7 +52,11 @@ end
 function Intro:update(dt)
     if love.timer.getTime() - self.init_time > self.wait_time
     then
-        Gamestate.switch(Menu)
+        if do_intro then
+            Gamestate.switch(Intro)
+        else
+            Gamestate.switch(Game)
+        end
     end
 end
 
