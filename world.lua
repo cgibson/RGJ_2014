@@ -117,7 +117,7 @@ World = Class{
     selectTile = function(self, px, py)
 
         -- From world coordinates to hex coordinates
-        cx, cy = HXM.getHexFromPixel(px, py, self.tile_radius, self.offset[1], self.offset[2])
+        cx, cy = HXM.getHexFromPixel(px, py, TILE_RADIUS, self.offset[1], self.offset[2])
         print("you selected tile (", cx, ", ", cy, ")")
 
         -- one indexed. ONE INDEXED
