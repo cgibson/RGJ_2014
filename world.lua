@@ -4,6 +4,7 @@
 --
 Class = require "hump.class"
 HXM = require "HexaMoon.HexaMoon"
+hexmath = require "HexaMath.HexaMath"
 c = require "constants"
 
 Tile = require "entities.tile"
@@ -119,6 +120,7 @@ World = Class{
         -- From world coordinates to hex coordinates
         cx, cy = HXM.getHexFromPixel(px, py, TILE_RADIUS, self.offset[1], self.offset[2])
         print("you selected tile (", cx, ", ", cy, ")")
+		print("selected tile is ", hexmath.Distance(cx, cy, 0, 0), " from origin")
 
         -- one indexed. ONE INDEXED
         cx = cx+1
