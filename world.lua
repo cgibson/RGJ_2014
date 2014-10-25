@@ -6,7 +6,7 @@ Class = require "hump.class"
 HXM = require "HexaMoon.HexaMoon"
 c = require "constants"
 
-Tile = require "tile"
+Tile = require "entities.tile"
 
 local HEX_DRAW_BASE, HEX_DRAW_SELECTED, HEX_DRAW_CONTENTS = 1, 2, 3
 
