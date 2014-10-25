@@ -135,6 +135,17 @@ function hxm.drawRectGrid(grid, drawFunction, radius, ox, oy, args)
 	end
 end
 
+function hxm.drawRectGridX(grid, drawFunction, radius, ox, oy, args)
+	for y=1, grid.height do
+		for x=-((math.ceil((grid.width-1)+(grid.height-1)/2))-grid.width), grid.width do
+			if grid.grid[y][x] ~= nil then
+				local hexCoords = HXM.getCoordinates(radius, x-1, y-1, ox, oy)
+				drawFunction(hexCoords, grid.grid[x][y], args)
+			end
+		end
+	end
+end
+
 -- Draws rhombus grid using a drawing function (must take arguments radius, vertices, grid object and other optional arguments)
 function hxm.drawRhombusGrid(grid, drawFunction, radius, ox, oy, args)
 	for y=1, grid.height do

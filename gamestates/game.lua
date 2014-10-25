@@ -10,7 +10,7 @@ local Game = {}
 
 
 function Game:enter()
-    self.world = World(10, 10)
+    self.world = World(50, 50)
     self.camera = Camera(0, 0)
 
     -- Mouse variables
