@@ -4,10 +4,11 @@
 --
 Class = require "hump.class"
 HXM = require "HexaMoon.HexaMoon"
+c = require "constants"
 
 Tile = require "tile"
 
-local HEX_DRAW_BASE, HEX_DRAW_SELECTED = 1, 2
+local HEX_DRAW_BASE, HEX_DRAW_SELECTED, HEX_DRAW_CONTENTS = 1, 2, 3
 
 local HEX_COLOR_BLACK = {30, 30, 30 }
 local HEX_BORDER = {60, 60, 110 }
@@ -15,6 +16,8 @@ local HEX_BORDER_SELECTED = {100, 100, 150 }
 
 local HEX_BORDER_WIDTH = 1
 local HEX_BORDER_WIDTH_SELECTED = 3
+
+local TILE_RADIUS = 48
 
 World = Class{
     init = function( self, width, height )
@@ -24,7 +27,8 @@ World = Class{
 
         self.hexGrid["grid"][1][1] = {color=HEX_COLOR_BLACK, selected = true }
 
-        -- FANCY DEBUG TIME
+        -- TODO: Fancy generation things
+        -- START FANCY DEBUG TIME
         self:setTile( 1, 1, Tile() )
         self:setTile( 2, 1, Tile() )
         self:setTile( 3, 1, Tile() )
@@ -33,7 +37,9 @@ World = Class{
         self:setTile( 1, 3, Tile() )
         self:setTile( 1, 4, Tile() )
 
-        self.tile_radius = 48
+        self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
+        -- END FANCY DEBUG TIME
+
         self.offset = {0, 0}
     end,
 
@@ -46,15 +52,17 @@ World = Class{
         love.graphics.setLineWidth(1)
 
         -- Draw base grid and backgrounds
-        HXM.drawRectGrid(self.hexGrid, self.drawHexagon, self.tile_radius, self.offset[1], self.offset[2], {mode=HEX_DRAW_BASE})
+        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_BASE})
 
         -- Draw selected grids
-        HXM.drawRectGrid(self.hexGrid, self.drawHexagon, self.tile_radius, self.offset[1], self.offset[2], {mode=HEX_DRAW_SELECTED})
+        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_SELECTED})
 
         -- Draw contents (TODO)
+        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_CONTENTS})
+
     end,
 
-    drawHexagon = function(vertices, obj, args)
+    drawHexagon = function(hexCoords, obj, args)
 
         if obj == 0 then
             return
@@ -62,6 +70,7 @@ World = Class{
 
         if args.mode == HEX_DRAW_BASE then
             -- Draw the background
+            local vertices = HXM.getHexVertices(TILE_RADIUS, hexCoords.x, hexCoords.y)
             love.graphics.setColor(obj.color)
 
             love.graphics.polygon("fill",    vertices[1].x, vertices[1].y,
@@ -84,8 +93,10 @@ World = Class{
 
         elseif args.mode == HEX_DRAW_SELECTED then
 
-            --
+            -- Draw only if we have the tile selected
             if obj.selected == true then
+
+                local vertices = HXM.getHexVertices(TILE_RADIUS, hexCoords.x, hexCoords.y)
 
                 -- Draw the border
                 love.graphics.setColor(HEX_BORDER_SELECTED)
@@ -98,21 +109,30 @@ World = Class{
                                                  vertices[5].x, vertices[5].y,
                                                  vertices[6].x, vertices[6].y)
             end
+        elseif args.mode == HEX_DRAW_CONTENTS then
+            obj:draw(hexCoords.x, hexCoords.y)
         end
     end,
 
     selectTile = function(self, px, py)
+
+        -- From world coordinates to hex coordinates
         cx, cy = HXM.getHexFromPixel(px, py, self.tile_radius, self.offset[1], self.offset[2])
         print("you selected tile (", cx, ", ", cy, ")")
 
+        -- one indexed. ONE INDEXED
         cx = cx+1
         cy = cy+1
 
+        -- TODO: avoid out-of-bounds
+
+        -- Non-tiles should be skipped
         if self.hexGrid.grid[cy][cx] == 0 then
             print("You selected an empty tile you doofus!")
             return
         end
 
+        -- TODO: instead of toggling, we should only have one selected tile at once
         self.hexGrid.grid[cy][cx].selected = (self.hexGrid.grid[cy][cx].selected == false)
     end
 }

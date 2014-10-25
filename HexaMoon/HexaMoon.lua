@@ -140,7 +140,7 @@ function hxm.drawRectGridX(grid, drawFunction, radius, ox, oy, args)
 		for x=-((math.ceil((grid.width-1)+(grid.height-1)/2))-grid.width), grid.width do
 			if grid.grid[y][x] ~= nil then
 				local hexCoords = HXM.getCoordinates(radius, x-1, y-1, ox, oy)
-				drawFunction(hexCoords, grid.grid[x][y], args)
+				drawFunction(hexCoords, grid.grid[y][x], args)
 			end
 		end
 	end

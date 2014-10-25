@@ -8,7 +8,6 @@
 Class = require "hump.class"
 local c = require "constants"
 
-
 --
 -- TILE class
 --
@@ -18,12 +17,15 @@ Tile = Class{
     init = function( self )
         self.selected = false
         self.color = c.Colors.HEX_BLACK
+        self.type = c.Tiles.TYPE_SPACE
     end
 }
 
-function Tile:draw()
-    love.graphics.setColor( 255, 0, 0, 255 )
-    love.graphics.rectangle( "fill", 100, 100, 200, 200 )
+function Tile:draw(x, y)
+    if self.type == c.Tiles.TYPE_PLANET then
+        love.graphics.setColor(240, 240, 20)
+        love.graphics.circle("fill", x, y, 32)
+    end
 end
 
 
