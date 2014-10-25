@@ -28,8 +28,15 @@ Constants = {
 
     Tiles = {
         TYPE_SPACE = 0,
-        TYPE_PLANET = 1
+        TYPE_PLANET = 1,
+		TYPE_ASTEROID = 2
     }
+	
+	Events = {
+		NONE = 0,
+		GOOD_EVENT = 1,
+		BAD_EVENT = 2
+	}
 }
 
 --

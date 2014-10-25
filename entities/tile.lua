@@ -16,8 +16,32 @@ local c = require "constants"
 Tile = Class{
     init = function( self )
         self.selected = false
+		
+		-- Black = Unexplored
+		-- Grey = Explored
+		-- Blue = Player-owned
+		-- Yellow = Enemy player owned
+		-- White = Impassable
         self.color = c.Colors.HEX_BLACK
-        self.type = c.Tiles.TYPE_SPACE
+		
+		-- Space
+		-- Planet
+		-- Impassable
+		self.type = c.Tiles.TYPE_SPACE
+		
+		-- Type of event on this tile
+		self.event_type = c.Events.NONE
+		
+		-- Count of number of relays passing through this tile
+		-- When a new relay is created, ++ to all tiles in range
+		-- When a relay is destroyed, -- to all tiles in range
+		-- If relayCount > 0, weight to travel through is 1
+		self.relayCount = 0
+		
+		-- Has this tile been explored by the player?
+		-- If yes, weight to travel through is 2
+		-- If no, weight to travel through is 3
+		self.explored = false
     end
 }
 
@@ -28,5 +52,15 @@ function Tile:draw(x, y)
     end
 end
 
+function Tile:getWeight()
+	if self.type == c.Tiles.TYPE_ASTEROID then
+		return 9999
+	elseif self.relayCount > 0 then
+		return 1
+	elseif self.explored = true then
+		return 2
+	else
+		return 3
+	end
 
 return Tile
