@@ -1,8 +1,13 @@
 --
--- Created by IntelliJ IDEA.
--- User: cgibson
--- Date: 10/24/14
--- Time: 10:58 PM
--- To change this template use File | Settings | File Templates.
+-- Mostly just a bootstrap to send the user to the 'menu' gamestate
 --
 
+Gamestate = require "hump.gamestate"
+local Intro = require "gamestates.intro"
+
+function love.load()
+    -- Override normal love'ly behavior (render, keys, etc)
+    Gamestate.registerEvents()
+    -- Change to menu gamestate
+    Gamestate.switch(Intro)
+end

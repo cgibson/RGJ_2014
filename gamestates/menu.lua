@@ -1,8 +1,11 @@
---
--- Created by IntelliJ IDEA.
--- User: cgibson
--- Date: 10/24/14
--- Time: 10:58 PM
--- To change this template use File | Settings | File Templates.
---
 
+Gamestate = require "hump.gamestate"
+
+local Menu = {}
+
+
+function Menu:draw()
+    love.graphics.print("This is the menu!", 400, 300)
+end
+
+return Menu
