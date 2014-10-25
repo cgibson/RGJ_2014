@@ -1,13 +1,14 @@
 
-Gamestate = require "hump.gamestate"
-World = require "world"
+local Gamestate = require "hump.gamestate"
+local World = require "world"
+require "constants"
 
 -- Game gamestate object
 local Game = {}
 
 
 function Game:enter()
-    world = World(10, 10)
+    self.world = World(10, 10)
 end
 
 
@@ -15,7 +16,7 @@ end
 -- DRAW function
 --
 function Game:draw()
-    world:draw()
+    self.world:draw()
 
     love.graphics.setColor(255, 255, 255, 255)
 end
@@ -35,10 +36,20 @@ end
 -- MOUSE functions
 --
 function Game:mousepressed( x, y, mouse )
+    if mouse == MOUSE_BUTTON_LEFT then
+
+    elseif mouse == MOUSE_BUTTON_RIGHT then
+
+    end
     print("Mouse ", mouse, " pressed at location (", x, ", ", y, ")")
 end
 
 function Game:mousereleased( x, y, mouse )
+    if mouse == MOUSE_BUTTON_LEFT then
+        self.world:selectTile(x, y)
+    elseif mouse == MOUSE_BUTTON_RIGHT then
+
+    end
 end
 
 return Game

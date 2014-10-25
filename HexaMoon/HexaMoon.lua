@@ -42,8 +42,8 @@ end
 
 -- Gets hexagon coordinate from a pixel coordinate
 function hxm.getHexFromPixel(px, py, radius, ox, oy)
-	local x = (1/3*sqrt(3) * (px-ox) - 1/3 * (py-oy))/radius
-	local y = 2/3 * (py-oy) / size
+	local x = (1/3*math.sqrt(3) * (px-ox) - 1/3 * (py-oy))/radius
+	local y = 2/3 * (py-oy) / radius
 
 	local nx, ny = hxm.getNearestHex(x, y)
 	return nx, ny

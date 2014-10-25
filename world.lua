@@ -23,14 +23,17 @@ World = Class{
 
         self.hexGrid["grid"][2][1] = {color ={40,40,80}}
         self.hexGrid["grid"][3][1] = {color ={40,40,80}}
-        self.hexGrid["grid"][4][1] = {color ={40,40,80}}
+        self.hexGrid["grid"][4][1] = {color ={40,40,80} }
+
+        self.tile_radius = 48
+        self.offset = {0, 0}
     end,
 
     draw = function( self )
         love.graphics.setColor(255, 255, 255)
         love.graphics.setLineWidth(1)
-        HXM.drawRectGrid(self.hexGrid, self.drawHexagon, 48, 80, 50, {mode="fill"})
-        HXM.drawRectGrid(self.hexGrid, self.drawHexagon, 48, 80, 50, {mode="line"})
+        HXM.drawRectGrid(self.hexGrid, self.drawHexagon, self.tile_radius, self.offset[1], self.offset[2], {mode="fill"})
+        HXM.drawRectGrid(self.hexGrid, self.drawHexagon, self.tile_radius, self.offset[1], self.offset[2], {mode="line"})
     end,
 
     drawHexagon = function(vertices, obj, args)
@@ -58,6 +61,12 @@ World = Class{
                                              vertices[5].x, vertices[5].y,
                                              vertices[6].x, vertices[6].y)
         end
+    end,
+
+    selectTile = function(self, px, py)
+        print("searching for tile: (", px, ", ", py, ")")
+        cx, cy = HXM.getHexFromPixel(px, py, self.tile_radius, self.offset[1], self.offset[2])
+        print("you selected tile (", cx, ", ", cy, ")")
     end
 }
 
