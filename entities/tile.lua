@@ -53,14 +53,14 @@ function Tile:draw(x, y)
 end
 
 function Tile:getWeight()
-	if self.type == c.Tiles.TYPE_ASTEROID then
-		return 9999
-	elseif self.relayCount > 0 then
-		return 1
-	elseif self.explored == true then
-		return 2
-	else
-		return 3
+    if self.type == c.Tiles.TYPE_ASTEROID then
+        return 9999
+    elseif self.relayCount > 0 then
+        return 1
+    elseif self.explored == true then
+        return 2
+    else
+        return 3
     end
 end
 
