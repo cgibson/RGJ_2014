@@ -30,7 +30,7 @@ Constants = {
         TYPE_SPACE = 0,
         TYPE_PLANET = 1,
 		TYPE_ASTEROID = 2
-    }
+    },
 	
 	Events = {
 		NONE = 0,

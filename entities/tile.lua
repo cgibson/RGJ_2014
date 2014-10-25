@@ -57,10 +57,11 @@ function Tile:getWeight()
 		return 9999
 	elseif self.relayCount > 0 then
 		return 1
-	elseif self.explored = true then
+	elseif self.explored == true then
 		return 2
 	else
 		return 3
 	end
+end
 
 return Tile
