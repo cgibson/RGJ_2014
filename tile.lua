@@ -7,20 +7,6 @@
 
 Class = require "hump.class"
 
-local TILE_CLEAR, TILE_BLOCKED
-
-
-tile_size = 128
-
---
--- Finds out where the upper left point of the image will
--- be with respect to the tile position, camera position
--- and camera zoom
---
-function tilePosToScreen( tile_pos, camera )
-
-end
-
 
 --
 -- TILE class

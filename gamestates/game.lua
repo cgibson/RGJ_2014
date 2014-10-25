@@ -1,13 +1,13 @@
 
 Gamestate = require "hump.gamestate"
-Tile = require "tile"
+World = require "world"
 
 -- Game gamestate object
 local Game = {}
 
 
 function Game:enter()
-    tile = Tile()
+    world = World(10, 10)
 end
 
 
@@ -15,7 +15,7 @@ end
 -- DRAW function
 --
 function Game:draw()
-    tile.draw( {0, 0}, "assets/images/test.png" )
+    world:draw()
 
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.print("Drawing tiles!", 400, 300)
