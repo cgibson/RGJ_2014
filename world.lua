@@ -15,13 +15,6 @@ Tile = require "entities.tile"
 --
 local HEX_DRAW_BASE, HEX_DRAW_SELECTED, HEX_DRAW_CONTENTS = 1, 2, 3
 
-local HEX_COLOR_BLACK = {30, 30, 30 }
-local HEX_BORDER = {60, 60, 110 }
-local HEX_BORDER_SELECTED = {100, 100, 150 }
-
-local HEX_BORDER_WIDTH = 1
-local HEX_BORDER_WIDTH_SELECTED = 3
-
 local TILE_RADIUS = 48
 
 
@@ -120,8 +113,8 @@ World = Class{
                                              vertices[6].x, vertices[6].y)
 
             -- Draw the border
-            love.graphics.setColor(HEX_BORDER)
-            love.graphics.setLineWidth(HEX_BORDER_WIDTH)
+            love.graphics.setColor(c.Colors.HEX_BORDER)
+            love.graphics.setLineWidth(c.Lines.HEX_BORDER_WIDTH)
 
             love.graphics.polygon("line",    vertices[1].x, vertices[1].y,
                                              vertices[2].x, vertices[2].y,
@@ -140,8 +133,8 @@ World = Class{
                 local vertices = HXM.getHexVertices(TILE_RADIUS, hexCoords.x, hexCoords.y)
 
                 -- Draw the border
-                love.graphics.setColor(HEX_BORDER_SELECTED)
-                love.graphics.setLineWidth(HEX_BORDER_WIDTH_SELECTED)
+                love.graphics.setColor(c.Colors.HEX_BORDER_SELECTED)
+                love.graphics.setLineWidth(c.Lines.HEX_BORDER_WIDTH_SELECTED)
 
                 love.graphics.polygon("line",    vertices[1].x, vertices[1].y,
                                                  vertices[2].x, vertices[2].y,

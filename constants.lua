@@ -22,15 +22,15 @@ Constants = {
     },
 
     Lines = {
-        HEX_BORDER           = 1,
-        HEX_BORDER_SELECTED = 3
+        HEX_BORDER_WIDTH           = 1,
+        HEX_BORDER_WIDTH_SELECTED = 3
     },
 
     Tiles = {
         TYPE_SPACE = 0,
         TYPE_PLANET = 1,
 		TYPE_ASTEROID = 2
-    }
+    },
 	
 	Events = {
 		NONE = 0,
