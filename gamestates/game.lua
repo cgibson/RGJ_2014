@@ -18,7 +18,6 @@ function Game:draw()
     world:draw()
 
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.print("Drawing tiles!", 400, 300)
 end
 
 
@@ -36,6 +35,7 @@ end
 -- MOUSE functions
 --
 function Game:mousepressed( x, y, mouse )
+    print("Mouse ", mouse, " pressed at location (", x, ", ", y, ")")
 end
 
 function Game:mousereleased( x, y, mouse )
