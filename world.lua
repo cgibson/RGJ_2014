@@ -33,6 +33,7 @@ World = Class{
         self.bounds = self:getBounds()
 
 	    self.hexGrid = HXM.createRectGrid(width, height, 0)
+        hexamath.createMemo( width, height )
 
         -- Contains information about each player and the entities they control
         self.playerData = {
@@ -62,7 +63,9 @@ World = Class{
         self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
 
         shepherd = Shepherd( self, Vector(1,1))
-        shepherd:setNewPath( {Vector(1,2), Vector(1,3), Vector(1,4)} )
+        
+        -- Hard coded shepherd path
+        --shepherd:setNewPath( {Vector(1,2), Vector(1,3), Vector(1,4)} )
 
         self.playerData.player_1.entities[#self.playerData.player_1.entities + 1] = shepherd
 
@@ -77,7 +80,6 @@ World = Class{
     getTile = function( self, pos )
         return self.hexGrid.grid[pos.y][pos.x]
     end,
-
 
     --
     -- DRAW function
@@ -237,9 +239,47 @@ World = Class{
         end
 
         -- TODO: instead of toggling, we should only have one selected tile at once
-        self.hexGrid.grid[cy][cx].selected = (self.hexGrid.grid[cy][cx].selected == false)
+        if Vector(cy, cx) == shepherd.position then
+            shepherd.selected = true
+        else
+            self.hexGrid.grid[cy][cx].selected = (self.hexGrid.grid[cy][cx].selected == false)
+        end
     end,
+    
+    rightSelectTile = function(self, px, py)
 
+        -- From world coordinates to hex coordinates
+        cx, cy = HXM.getHexFromPixel(px, py, c.Tiles.TILE_RADIUS, 0, 0)
+        print("you selected tile (", cx, ", ", cy, ")")
+		print("selected tile is ", hexamath.Distance(cx, cy, 0, 0), " from origin")
+
+        -- one indexed. ONE INDEXED
+        cx = cx+1
+        cy = cy+1
+
+        -- avoid out-of-bounds
+        if self:outOfBounds(cx, cy) then
+            -- print("out of bounds")
+            return
+        end
+
+        -- handle empty sections of the grid
+        if self.hexGrid.grid[cy][cx] == nil then
+            -- print("no data here")
+            return
+        end
+
+        -- Non-tiles should be skipped
+        if self.hexGrid.grid[cy][cx] == 0 then
+            print("You selected an empty tile you doofus!")
+            return
+        end
+
+        -- If the shepherd is selected, the selected space is it's destination
+        if shepherd.selected == true then
+            shepherd.move_action( Vector(cx, cy) )
+        end
+    end,
 
     --
     -- UPDATE function

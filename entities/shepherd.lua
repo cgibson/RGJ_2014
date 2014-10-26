@@ -2,6 +2,7 @@
 
 HXM = require "HexaMoon.HexaMoon"
 local c = require "constants"
+hexamath = require "HexaMath.HexaMath"
 
 local STATE_IDLE, STATE_MOVING, STATE_BUILDING, STATE_RETREATING = 0, 1, 2, 3
 
@@ -22,6 +23,7 @@ Shepherd = Class {
                                                     -- once it arrives at its destination
 
         self.state =                    STATE_IDLE  -- idle, building, moving, retreating
+        self.selected =                 false
     end,
 
 
@@ -39,7 +41,7 @@ Shepherd = Class {
             if t - self.time_since_last_action > self.speed then
                 -- Pop the next point along the path from the FiFo and move the shepherd
                 self:do_move(self.position, table.remove(self.current_path, 1))
-
+                
                 -- Reset time last moved
                 self.time_since_last_action = t
 
@@ -70,7 +72,15 @@ Shepherd = Class {
             end
         end
     end,
-
+    
+    is_on_path = function( self, pos)
+        for _,v in pairs(self.current_path) do
+            if v == pos then
+                return true
+            end
+        end
+        return false
+    end,
 
     --
     -- Internal movement function
@@ -88,12 +98,14 @@ Shepherd = Class {
 
     move_action = function( self, move_to )
         self.state = STATE_MOVING
+        self.time_since_last_move = love.timer.getTime()
         self.to_build = nil -- We no longer want to build whatever we might have been assigned to build
 
         -- Build path to the destination
-
         -- Set it to current_path
 
+        self.current_path = hexamath.CalculatePath( self.world, self.position, move_to ) 
+        print("path coded as ", self.current_path[1])
     end,
 
 
@@ -114,6 +126,7 @@ Shepherd = Class {
     drawPath = function( self )
         love.graphics.setColor(0, 255, 0)
         for i = 1, #self.current_path do
+            print("DRAWING!")
             -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
             local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.current_path[i].x-1, self.current_path[i].y-1, 0, 0)
             love.graphics.rectangle("fill",
