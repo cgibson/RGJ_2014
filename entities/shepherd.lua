@@ -15,6 +15,7 @@ Shepherd = Class {
         self.world =                    world       -- Copy of the world (for movement/placement)
         self.position =                 pos
         self.current_path =             {}
+        self.destination =              pos
         self.speed =                    1           -- Speed (blocks/sec)
         self.time_since_last_action =   0           -- Time since last movement
                                                     -- TODO: we should replace this with a tween sooner or later
@@ -43,24 +44,26 @@ Shepherd = Class {
         if self.state == STATE_MOVING then
             if t - self.time_since_last_action > self.speed then
                 -- Pop the next point along the path from the FiFo and move the shepherd
-                self:do_move(self.position, table.remove(self.current_path, 1))
-                
-                -- Reset time last moved
-                self.time_since_last_action = t
+                if self:do_move(self.position, table.remove(self.current_path, 1)) == false then
+                    self:emergency_stop()
+                else
+                    -- Reset time last moved
+                    self.time_since_last_action = t
 
-                -- If we currently are at the end of our current path, then we're dun
-                --
-                if #self.current_path < 1 then
-
-                    -- If we have something to build, then start building it
+                    -- If we currently are at the end of our current path, then we're dun
                     --
-                    if self.to_build ~= nil then
-                        self.time_since_last_action = love.timer.getTime()
-                        -- Update state to BUILDING
-                        self.state = STATE_BUILDING
-                    else
-                        -- Otherwise, we're idle
-                        self.state = STATE_IDLE
+                    if #self.current_path < 1 then
+
+                        -- If we have something to build, then start building it
+                        --
+                        if self.to_build ~= nil then
+                            self.time_since_last_action = love.timer.getTime()
+                            -- Update state to BUILDING
+                            self.state = STATE_BUILDING
+                        else
+                            -- Otherwise, we're idle
+                            self.state = STATE_IDLE
+                        end
                     end
                 end
             end
@@ -76,6 +79,11 @@ Shepherd = Class {
         end
     end,
     
+    emergency_stop = function (self, pos )
+        self.current_path = {}
+        self.state = STATE_IDLE
+    end,
+    
     is_on_path = function( self, pos)
         for _,v in pairs(self.current_path) do
             if v == pos then
@@ -89,15 +97,22 @@ Shepherd = Class {
     -- Internal movement function
     --
     do_move = function( self, old_pos, new_pos )
+        local oldTile = self.world:getTile(old_pos)
+        local newTile = self.world:getTile(new_pos)
+        if self.hp < 10 and newTile.explored[c.PLAYER_1] == false then
+            return false
+        end
+        if newTile.type == c.Tiles.TYPE_ASTEROID then
+            newTile:explore(c.PLAYER_1)
+            return false
+        end
+        self.hp = self.hp - 1
         self.position = new_pos
-
-        local tile = self.world:getTile(old_pos)
-        tile:removeEntity(self)
-
-        tile = self.world:getTile(new_pos)
-        tile:addEntity(self)
+        oldTile:removeEntity(self)
+        newTile:addEntity(self)
         
         self:scanTiles(self.hp, new_pos)
+        return true
     end,
 
     scanTiles = function( self, hp, pos )
@@ -114,6 +129,9 @@ Shepherd = Class {
                 scanTile = self.world:getTile(newVector)
                 if scanTile ~= nil then
                     scanTile:explore(c.PLAYER_1)
+                    if scanTile.type == c.Tiles.TYPE_ASTEROID and self:is_on_path( newVector ) then
+                        self:move_action( self.destination )
+                    end
                 end
                 sensor_x = x
                 sensor_y = y
@@ -124,13 +142,14 @@ Shepherd = Class {
     move_action = function( self, move_to )
         if self.position ~= move_to then
             self.state = STATE_MOVING
+            self.destination = move_to
             self.time_since_last_move = love.timer.getTime()
             self.to_build = nil -- We no longer want to build whatever we might have been assigned to build
 
             -- Build path to the destination
             -- Set it to current_path
 
-            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to ) 
+            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to, self.hp < 10) 
             print("path length: ", #self.current_path)
             for key,value in pairs(self.current_path) do print("   ", key,value) end
         end

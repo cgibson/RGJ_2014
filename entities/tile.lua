@@ -27,7 +27,11 @@ Tile = Class{
 		-- Space
 		-- Planet
 		-- Impassable
-		self.type = c.Tiles.TYPE_SPACE
+        if math.random(1,5) == 1 then
+            self.type = c.Tiles.TYPE_ASTEROID
+        else
+            self.type = c.Tiles.TYPE_SPACE
+        end
 		
 		-- Type of event on this tile
 		self.event_type = c.Events.NONE
@@ -155,15 +159,18 @@ function Tile:draw(x, y)
     end
 end
 
-function Tile:getWeight( playerId )
-    if self.type == c.Tiles.TYPE_ASTEROID then
+function Tile:getWeight( playerId , retreat)
+    if self.explored[playerId] == false then
+        if retreat then
+            return 9999
+        end
+        return 3
+    elseif self.type == c.Tiles.TYPE_ASTEROID then
         return 9999
     elseif self.relayCount[playerId] > 0 then
         return 1
-    elseif self.explored[playerId] == true then
-        return 2
     else
-        return 3
+        return 2
     end
 end
 

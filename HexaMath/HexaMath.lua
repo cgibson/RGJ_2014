@@ -21,7 +21,7 @@ function hexamath.VectorDistance(h1, h2)
 	return (math.abs(h1_x - h2_x) + math.abs(h1_y - h2_y) + math.abs(h1_x + h1_y - h2_x - h2_y)) / 2
 end
 
-function hexamath.CalculatePath( world, vector1, vector2 )
+function hexamath.CalculatePath( world, vector1, vector2, retreat )
     -- return {Vector(1,2), Vector(1,3), Vector(1,4)}
     frontier = {}
     grid_memo = {}
@@ -45,7 +45,7 @@ function hexamath.CalculatePath( world, vector1, vector2 )
                     newTile.selected = true
                 end
                 grid_cost[newVectorId] = grid_cost[frontier_i.x .. "," .. frontier_i.y]
-                grid_cost[newVectorId] = grid_cost[newVectorId] + newTile:getWeight(1)
+                grid_cost[newVectorId] = grid_cost[newVectorId] + newTile:getWeight(1, retreat)
                 if newVector == vector2 then
                     --print("OH DEAR GOD I FOUND IT")
                     --for k2,v2 in pairs(grid_memo) do
