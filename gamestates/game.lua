@@ -20,7 +20,6 @@ function Game:enter()
     -- Action/meta variables
     self.meta_key = false
 
-
     -- Action status
     self.camera_moving = false
 end

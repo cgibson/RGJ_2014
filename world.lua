@@ -3,19 +3,13 @@
 --
 --
 Class = require "hump.class"
+Vector = require "hump.vector"
 HXM = require "HexaMoon.HexaMoon"
 hexamath = require "HexaMath.HexaMath"
 c = require "constants"
 
 Tile = require "entities.tile"
-
--- TODO: Decide if these should be
---       A. In the World class itself, or
---       B. A constant (in 'constants')
---
-local HEX_DRAW_BASE, HEX_DRAW_SELECTED, HEX_DRAW_CONTENTS = 1, 2, 3
-
-local TILE_RADIUS = 48
+Shepherd = require "entities.shepherd"
 
 
 --
@@ -38,7 +32,20 @@ World = Class{
 	    self.hexGrid = HXM.createRectGrid(width, height, 0)
 
         -- Contains information about each player and the entities they control
-        self.playerEntities = {player_1={}, player_2={}, player_3={}, player_4={} }
+        self.playerData = {
+
+            -- User
+            player_1 = {
+                entities = {},
+                selection = nil
+            },
+
+            -- Enemy (AI for now)
+            player_2 = {
+                entities = {},
+                selection = nil
+            }
+        }
 
         -- TODO: Fancy generation things
         -- START FANCY DEBUG TIME
@@ -50,10 +57,10 @@ World = Class{
         self:setTile( 1, 3, Tile() )
         self:setTile( 1, 4, Tile() )
 
+        self.playerData.player_1.entities[#self.playerData.player_1.entities + 1] = Shepherd( Vector(1,1) )
+
         self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
         -- END FANCY DEBUG TIME
-
-        self.offset = {0, 0}
     end,
 
     setTile = function( self, cx, cy, obj )
@@ -74,17 +81,24 @@ World = Class{
         love.graphics.setLineWidth(1)
 
         -- Draw base grid and backgrounds
-        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_BASE})
+        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, c.Tiles.TILE_RADIUS, 0, 0, {mode=c.Tiles.HEX_DRAW_BASE})
 
         -- Draw boundary grid
         -- TODO
 
         -- Draw selected grids
-        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_SELECTED})
+        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, c.Tiles.TILE_RADIUS, 0, 0, {mode=c.Tiles.HEX_DRAW_SELECTED})
 
         -- Draw contents
-        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_CONTENTS})
+        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, c.Tiles.TILE_RADIUS, 0, 0, {mode=c.Tiles.HEX_DRAW_CONTENTS})
 
+        -- Draw entities
+        for playerId, data in pairs(self.playerData) do
+            -- Update entities
+            for idx, entity in pairs(data.entities) do
+                entity:draw()
+            end
+        end
     end,
 
 
@@ -108,9 +122,9 @@ World = Class{
 
         -- Draw the base hex grid
         --
-        if args.mode == HEX_DRAW_BASE then
+        if args.mode == c.Tiles.HEX_DRAW_BASE then
             -- Draw the background
-            local vertices = HXM.getHexVertices(TILE_RADIUS, hexCoords.x, hexCoords.y)
+            local vertices = HXM.getHexVertices(c.Tiles.TILE_RADIUS, hexCoords.x, hexCoords.y)
             love.graphics.setColor(obj.color)
 
             love.graphics.polygon("fill",    vertices[1].x, vertices[1].y,
@@ -133,12 +147,12 @@ World = Class{
 
         -- Draw the selected hexagons
         --
-        elseif args.mode == HEX_DRAW_SELECTED then
+        elseif args.mode == c.Tiles.HEX_DRAW_SELECTED then
 
             -- Draw only if we have the tile selected
             if obj.selected == true then
 
-                local vertices = HXM.getHexVertices(TILE_RADIUS, hexCoords.x, hexCoords.y)
+                local vertices = HXM.getHexVertices(c.Tiles.TILE_RADIUS, hexCoords.x, hexCoords.y)
 
                 -- Draw the border
                 love.graphics.setColor(c.Colors.HEX_BORDER_SELECTED)
@@ -156,7 +170,7 @@ World = Class{
         --
         -- Relies on Tile:draw(x,y)
         --
-        elseif args.mode == HEX_DRAW_CONTENTS then
+        elseif args.mode == c.Tiles.HEX_DRAW_CONTENTS then
             obj:draw(hexCoords.x, hexCoords.y)
         end
     end,
@@ -171,7 +185,7 @@ World = Class{
     selectTile = function(self, px, py)
 
         -- From world coordinates to hex coordinates
-        cx, cy = HXM.getHexFromPixel(px, py, TILE_RADIUS, self.offset[1], self.offset[2])
+        cx, cy = HXM.getHexFromPixel(px, py, c.Tiles.TILE_RADIUS, 0, 0)
         print("you selected tile (", cx, ", ", cy, ")")
 		print("selected tile is ", hexamath.Distance(cx, cy, 0, 0), " from origin")
 
@@ -208,8 +222,9 @@ World = Class{
     -- Updates the entire world and everything in it. This is considered one "tick"
     --
     update = function(self, dt)
-        for playerId, entities in pairs(self.playerEntities) do
-            for idx, entity in pairs(entities) do
+        for playerId, data in pairs(self.playerData) do
+            -- Update entities
+            for idx, entity in pairs(data.entities) do
                 entity:update(dt)
             end
         end
