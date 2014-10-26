@@ -60,11 +60,9 @@ function Game:mousepressed( x, y, mouse )
     self.mouse_drag = true
 
     if mouse == c.MOUSE_BUTTON_LEFT then
-        if self.meta_key then
-            self.camera_moving = true
-            self.mouse_last_pos = {x, y}
-        end
-
+        self.camera_moving = true
+        self.mouse_last_pos = {x, y}
+        self.camera_moved = false;
     elseif mouse == c.MOUSE_BUTTON_RIGHT then
     end
 end
@@ -75,9 +73,11 @@ function Game:mousereleased( x, y, mouse )
     if mouse == c.MOUSE_BUTTON_LEFT then
         self.camera_moving = false
 
-        -- Convert screen coordinates to world coordinates
-        wx, wy = self.camera:worldCoords(x, y)
-        self.world:selectTile(wx, wy)
+        if self.camera_moved == false then
+            -- Convert screen coordinates to world coordinates
+            wx, wy = self.camera:worldCoords(x, y)
+            self.world:selectTile(wx, wy)
+        end
     elseif mouse == c.MOUSE_BUTTON_RIGHT then
     end
 end
@@ -93,6 +93,10 @@ function Game:update(dt)
         local dx = self.mouse_last_pos[1] - mx
         local dy = self.mouse_last_pos[2] - my
 
+        if math.abs(dx) + math.abs(dy) > 0 then
+            self.camera_moved = true
+        end
+        
         self.mouse_last_pos = {mx, my}
         self.camera:move(dx,dy)
     end
