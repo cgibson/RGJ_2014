@@ -11,7 +11,7 @@ Shepherd = Class {
     init = function( self, world, pos )
         self.id =                       c.getNewId()
         self.type =                     c.Entities.TYPE_SHEPHERD
-        self.hp =                       20
+        self.hp =                       50
         self.world =                    world       -- Copy of the world (for movement/placement)
         self.position =                 pos
         self.current_path =             {}
@@ -99,14 +99,13 @@ Shepherd = Class {
     do_move = function( self, old_pos, new_pos )
         local oldTile = self.world:getTile(old_pos)
         local newTile = self.world:getTile(new_pos)
-        if self.hp < 10 and newTile.explored[c.PLAYER_1] == false then
+        if self.hp == 0 and newTile.explored[c.PLAYER_1] == false then
             return false
         end
         if newTile.type == c.Tiles.TYPE_ASTEROID then
             newTile:explore(c.PLAYER_1)
             return false
         end
-        self.hp = self.hp - 1
         self.position = new_pos
         oldTile:removeEntity(self)
         newTile:addEntity(self)
@@ -119,16 +118,20 @@ Shepherd = Class {
         scanTile = self.world:getTile(pos)
         if scanTile ~= nil then
             scanTile:explore(c.PLAYER_1)
+            print("Using", self.hp, "to reveal", scanTile)
+            self.hp = self.hp - 1
         end
         for k,v in pairs(c.DIRECTIONS) do
             sensor_x = pos.x
             sensor_y = pos.y
-            for i=1, hp/10 do
+            for i=1, math.min(hp/10, 2) do
                 x, y = HXM.getHexCoordinate(v, sensor_x, sensor_y)
                 newVector = Vector(x, y)
                 scanTile = self.world:getTile(newVector)
-                if scanTile ~= nil then
+                if scanTile ~= nil and scanTile.explored[c.PLAYER_1] == false then
                     scanTile:explore(c.PLAYER_1)
+                    print("Using", self.hp, "to reveal", scanTile)
+                    self.hp = self.hp - 1
                     if scanTile.type == c.Tiles.TYPE_ASTEROID and self:is_on_path( newVector ) then
                         self:move_action( self.destination )
                     end
@@ -149,7 +152,7 @@ Shepherd = Class {
             -- Build path to the destination
             -- Set it to current_path
 
-            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to, self.hp < 10) 
+            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to, self.hp == 0) 
             print("path length: ", #self.current_path)
             for key,value in pairs(self.current_path) do print("   ", key,value) end
         end
@@ -165,7 +168,8 @@ Shepherd = Class {
                                 coord.y - (self.height / 2),
                                 self.width,
                                 self.height)
-
+        love.graphics.setColor(255,0,0)
+        love.graphics.print("HP: " .. self.hp, coord.x, coord.y)
         self:drawPath()
     end,
 
