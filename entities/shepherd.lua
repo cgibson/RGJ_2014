@@ -42,16 +42,26 @@ Shepherd = Class {
                 -- Reset time last moved
                 self.time_since_last_action = t
 
+                -- If we currently are at the end of our current path, then we're dun
+                --
                 if #self.current_path < 1 then
+
+                    -- If we have something to build, then start building it
+                    --
                     if self.to_build ~= nil then
                         self.time_since_last_action = love.timer.getTime()
                         -- Update state to BUILDING
                         self.state = STATE_BUILDING
                     else
+                        -- Otherwise, we're idle
                         self.state = STATE_IDLE
                     end
                 end
             end
+
+        -- If we are building, check to see how long it will take to build whatever it is
+        -- TODO: We will need to wait for resources to come to us. There is no logic for receiving sheep yet
+        --
         elseif self.state == STATE_BUILDING then
             -- We are going to build something... figure out how much time it will take
             if t - self.time_since_last_action > self.to_build.build_time then
@@ -76,7 +86,12 @@ Shepherd = Class {
 
 
     move_action = function( self, move_to )
+        self.state = STATE_MOVING
+        self.to_build = nil -- We no longer want to build whatever we might have been assigned to build
 
+        -- Build path to the destination
+
+        -- Set it to current_path
 
     end,
 
