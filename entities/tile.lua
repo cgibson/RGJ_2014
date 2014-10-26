@@ -29,6 +29,8 @@ Tile = Class{
 		-- Impassable
         if math.random(1,5) == 1 then
             self.type = c.Tiles.TYPE_ASTEROID
+        elseif math.random(1,10) == 1 then
+            self.type = c.Tiles.TYPE_PLANET
         else
             self.type = c.Tiles.TYPE_SPACE
         end

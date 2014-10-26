@@ -99,12 +99,12 @@ Shepherd = Class {
     do_move = function( self, old_pos, new_pos )
         local oldTile = self.world:getTile(old_pos)
         local newTile = self.world:getTile(new_pos)
-        if self.hp == 0 and newTile.explored[c.PLAYER_1] == false then
+        if self.hp <= 0 and newTile.explored[c.PLAYER_1] == false then
             return false
         end
         if newTile.type == c.Tiles.TYPE_ASTEROID then
             newTile:explore(c.PLAYER_1)
-            self.hp = self.hp - 1
+            if self.hp > 0 then self.hp = self.hp - 1 end
             return false
         end
         self.position = new_pos
@@ -116,7 +116,7 @@ Shepherd = Class {
 
     scanTiles = function( self, hp, pos )
         scanTile = self.world:getTile(pos)
-        if scanTile ~= nil then
+        if scanTile ~= nil and scanTile.explored[c.PLAYER_1] == false and self.hp >= 1 then
             scanTile:explore(c.PLAYER_1)
             print("Using", self.hp, "to reveal", scanTile)
             self.hp = self.hp - 1
@@ -152,7 +152,7 @@ Shepherd = Class {
             -- Build path to the destination
             -- Set it to current_path
 
-            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to, self.hp == 0) 
+            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to, self.hp <= 0) 
             print("path length: ", #self.current_path)
             for key,value in pairs(self.current_path) do print("   ", key,value) end
         end
