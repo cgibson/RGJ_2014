@@ -1,6 +1,7 @@
 
 
 HXM = require "HexaMoon.HexaMoon"
+local c = require "constants"
 
 local STATE_IDLE, STATE_MOVING, STATE_BUILDING, STATE_RETREATING = 0, 1, 2, 3
 

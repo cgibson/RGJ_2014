@@ -40,6 +40,11 @@ Constants = {
 		NONE = 0,
 		GOOD_EVENT = 1,
 		BAD_EVENT = 2
+    },
+
+    Entities = {
+        RELAY_HP_MAX = 10,
+        RELAY_DISTANCE_MAX = 5
     }
 
 
