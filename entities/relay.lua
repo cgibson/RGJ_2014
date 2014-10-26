@@ -3,7 +3,7 @@ local c = require "constants"
 local Class = require "hump.class"
 local HXM = require "HexaMoon.HexaMoon"
 
-local STATE_IDLE, STATE_SHOOTING = 1, 2
+local STATE_IDLE, STATE_BUILDING, STATE_SHOOTING, STATE_PLACING = 1, 2, 3, 4
 
 Relay = Class {
     init = function( self, world, owner, pos, direction )
@@ -16,17 +16,10 @@ Relay = Class {
         self.state =                    STATE_IDLE
         self.owner =                    owner
         self.enabled =                  true
-
-        -- Auto-add this relay to the right tile
-        tile = self.world:getTile( pos )
-        if tile == nil then
-            error("Tile at (" .. self.position.x .. ", " .. self.position.y .. ") is not instantiated")
-        end
-
-        tile:addEntity(self)
+        self.target =                   nil
 
         -- Cached data to help speed up the sheeping routes
-        self.memoization = {can_send = nil, receiver = nil}
+        -- self.memoization = {can_send = nil, receiver = nil}
         -- TODO: implement "reserve sheep"
     end,
 
@@ -41,6 +34,138 @@ Relay = Class {
     end,
 
 
+    changeState = function( self, state)
+        local state_str = "UNKNOWN"
+
+        if state == STATE_BUILDING then state_str = "BUILDING"
+        elseif state == STATE_IDLE then state_str = "IDLE"
+        elseif state == STATE_PLACING then state_str = "PLACING"
+        elseif state == STATE_SHOOTING then state_str = "SHOOTING"
+        end
+
+        print("Relay (" .. self.id .. ") changed state to " .. state_str)
+
+        self.state = state
+    end,
+
+
+    updateTarget = function( self )
+        local coord = self.position
+        local tile, obj
+        for dist = 1, c.Entities.RELAY_DISTANCE_MAX do
+
+            -- Move the coordinate one tile in the direction the relay is facing
+            x, y = HXM.getHexCoordinate(self.direction, coord.x, coord.y)
+            tile = self.world:getTile(Vector(x, y))
+            coord = Vector(x, y)
+
+            -- We don't even care who's relay this is. If it exists, we point and shoot
+            obj = tile.getRelay()
+            if obj ~= nil then
+                print("Relay " .. self.id .. " targeting other relay " .. obj.id .. " on " .. tile.position.x .. "," .. tile.position.y)
+                self.target = obj
+                break
+            end
+
+            -- If it's a planet, then duh we send stuff there
+            obj = tile.getPlanet()
+            if obj ~= nil then
+                print("Relay " .. self.id .. " targeting planet on " .. tile.position.x .. "," .. tile.position.y)
+                self.target = obj
+                break
+            end
+        end
+
+        print("Relay " .. self.id .. " has no current target.")
+    end,
+
+
+    -- For each player, search through their receivers. If the receiver is WITHIN
+    -- RELAY_DISTANCE_MAX, then it's worth updating its target
+    notifyNearbyRelays = function( self )
+        for playerId, data in pairs(self.world.player_data) do
+            for relayId, relay in pairs(data.relays) do
+                local dist = hexamath.VectorDistance( self.position, relay.position )
+                if dist <= c.Entities.RELAY_DISTANCE_MAX then
+                    relay:updateTarget()
+                end
+            end
+        end
+    end,
+
+
+}
+
+
+function Relay.placeRelay(world, owner, pos, direction)
+
+    -- Ensure the tile exists
+    local tile = self.world:getTile( pos )
+    if tile == nil then
+        return {error="Cannot build there!"}
+    end
+
+    -- Make sure no other relay exists on that tile
+    if tile:getRelay() ~= nil then
+        return {error="Relay already on the tile"}
+    end
+
+    -- Cannot place on obstacles
+    if tile:getObstacle() ~= nil then
+        return {error="Tile is obstructed"}
+    end
+
+    -- Cannot place on planets
+    if tile:getPlanet() ~= nil then
+        return {error="Cannot place a rely on a planet"}
+    end
+
+    -- First, place the tile in the world
+    local relay = Relay(world, owner, pos, direction)
+
+    -- Set its state to BUILDING. It hasn't been built yet
+    relay:setState(STATE_PLACING)
+
+    -- Tell the world the player is trying to place this relay
+    world.player_data[owner].is_placing = true
+    world.player_date[owner].relay_to_build = relay
+
+    -- We DON'T add it to the actual grid yet. We don't want it
+    -- to screw up anyone's calculations
+end
+
+
+function Relay.buildRelay( world, playerId )
+    print("Building relay for player " .. playerId)
+
+    -- Grab the relay from player data
+    local relay = world.player_data[playerId].relay_to_build
+
+    -- Insert the relay into the tile
+    local tile = world:getTile( relay.position )
+    tile:addEntity(relay)
+
+    -- Add to player data
+    world.player_data.player_1.relays[#world.player-data[playerId].relays+1] = relay
+
+    -- STEP 1: Check to see who is the 'target' for this relay
+    --         This can be a relay or a planet.
+    relay:updateTarget()
+
+    -- STEP 2: Update any relays within distance to ensure their
+    --         Receiver is up-to-date as well
+    relay:notifyNearbyRelays()
+
+    -- Set relay's state to STATE_BUILDING. It still needs to be
+    -- built before it can be operational. Once its sheep reserve
+    -- is full, it will be set into an operational state
+    relay:setState(STATE_BUILDING)
+
+    -- Let the game know we are no longer placing the relay
+    world.player_data[playerId].is_placing = false
+end
+
+--[[
     updateSheepingCapability = function( self, prev )
 
         -- print("CHECKING (",self.id,") for sheeping capability")
@@ -253,6 +378,6 @@ function Relay.updateSheepingRoutes(relays)
     end
 
 end
-
+]]--
 
 return Relay

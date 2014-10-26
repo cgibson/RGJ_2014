@@ -39,21 +39,20 @@ World = Class{
         hexamath.createMemo( width, height )
 
         -- Contains information about each player and the entities they control
-        self.playerData = {
+        self.player_data = {}
 
             -- User
-            player_1 = {
+        self.player_data[c.PLAYER_1] = {
                 relays = {},
                 shepherd = nil,
                 selection = nil
-            },
+        }
 
             -- Enemy (AI for now)
-            player_2 = {
+        self.player_data[c.PLAYER_1] = {
                 relays = {},
                 shepherd = nil,
                 selection = nil
-            }
         }
 
         -- TODO: Fancy generation things
@@ -76,13 +75,13 @@ World = Class{
         -- Hard coded shepherd path
         --shepherd:setNewPath( {Vector(1,2), Vector(1,3), Vector(1,4)} )
 
-        self.playerData.player_1.shepherd = self.shepherd
+        self.player_data[c.PLAYER_1].shepherd = self.shepherd
 
-        local relay1 = Relay( self, c.PLAYER_1, Vector(3, 1), "W")
-        self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay1
+        --local relay1 = Relay( self, c.PLAYER_1, Vector(3, 1), "W")
+        --self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay1
 
-        local relay2 = Relay( self, c.PLAYER_1, Vector(5, 2), "W")
-        self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay2
+        --local relay2 = Relay( self, c.PLAYER_1, Vector(5, 2), "W")
+        --self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay2
 
 
 
@@ -123,7 +122,7 @@ World = Class{
         HXM.drawRectGridX(self.hexGrid, self.drawHexagon, c.Tiles.TILE_RADIUS, 0, 0, {mode=c.Tiles.HEX_DRAW_CONTENTS})
 
         -- Draw entities
-        for playerId, data in pairs(self.playerData) do
+        for playerId, data in pairs(self.player_data) do
             -- Update entities
             for idx, relay in pairs(data.relays) do
                 relay:draw()
@@ -311,7 +310,7 @@ World = Class{
     update = function(self, dt)
         t = love.timer.getTime()
 
-        for playerId, data in pairs(self.playerData) do
+        for playerId, data in pairs(self.player_data) do
             -- update Shepherds
             if data.shepherd ~= nil then
                 data.shepherd:update(dt)
@@ -322,8 +321,8 @@ World = Class{
 
         if t - self.time_since_last_tick > c.TICK_LENGTH then
             self.time_since_last_tick = t
-            for playerId, data in pairs(self.playerData) do
-                Relay.updateSheepingRoutes(data.relays)
+            for playerId, data in pairs(self.player_data) do
+                --Relay.updateSheepingRoutes(data.relays)
             end
         end
     end,
