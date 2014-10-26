@@ -53,6 +53,10 @@ Constants = {
         TYPE_RELAY = 1
     },
 
+    Gui = {
+        BUTTON_BUILD_RELAY = 0
+    },
+
     CRAZY_CHAN_MODE = true,
 
     PLAYER_1 = 1,

@@ -252,7 +252,7 @@ function Relay.startPlacingRelay(world, playerId, pos, direction)
     -- Add to player data to receive updates and draws
     world.player_data[playerId].relays[#world.player_data[playerId].relays+1] = relay
 
-    return nil
+    return {error=nil, obj=relay}
 end
 
 
@@ -286,6 +286,8 @@ function Relay.buildPendingRelay( world, playerId, freeSheep )
 
     -- Let the game know we are no longer placing the relay
     world.player_data[playerId].is_placing = false
+
+    return {error=nil, obj=relay}
 end
 
 --[[

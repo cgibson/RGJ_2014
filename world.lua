@@ -87,13 +87,13 @@ World = Class{
 
         -- RELAY 1
         local ret = Relay.startPlacingRelay( self, c.PLAYER_1, Vector(3,2), "W")
-        if ret ~= nil then
+        if ret.error ~= nil then
             print("WARNING: " .. ret.error)
         end
 
 
         ret = Relay.buildPendingRelay( self, c.PLAYER_1, c.Entities.RELAY_COST * 4 )
-        if ret ~= nil then
+        if ret.error ~= nil then
             print("WARNING: " .. ret.error)
         end
 
@@ -101,13 +101,13 @@ World = Class{
 
         -- RELAY 2
         ret = Relay.startPlacingRelay( self, c.PLAYER_1, Vector(1,2), "SE")
-        if ret ~= nil then
+        if ret.error ~= nil then
             print("WARNING: " .. ret.error)
         end
 
 
         ret = Relay.buildPendingRelay( self, c.PLAYER_1 )
-        if ret ~= nil then
+        if ret.error ~= nil then
             print("WARNING: " .. ret.error)
         end
 
@@ -115,13 +115,13 @@ World = Class{
 
         -- RELAY 3
         local ret = Relay.startPlacingRelay( self, c.PLAYER_1, Vector(1,4), "NE")
-        if ret ~= nil then
+        if ret.error ~= nil then
             print("WARNING: " .. ret.error)
         end
 
 
         local ret = Relay.buildPendingRelay( self, c.PLAYER_1 )
-        if ret ~= nil then
+        if ret.error ~= nil then
             print("WARNING: " .. ret.error)
         end
 
