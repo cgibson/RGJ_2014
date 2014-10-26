@@ -53,7 +53,7 @@ Constants = {
         TYPE_RELAY = 1
     },
 
-    CRAZY_CHAN_MODE = false,
+    CRAZY_CHAN_MODE = true,
 
     PLAYER_1 = 1,
     PLAYER_2 = 2,

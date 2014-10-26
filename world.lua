@@ -92,7 +92,7 @@ World = Class{
         end
 
 
-        ret = Relay.buildPendingRelay( self, c.PLAYER_1, c.Entities.RELAY_COST )
+        ret = Relay.buildPendingRelay( self, c.PLAYER_1, c.Entities.RELAY_COST * 4 )
         if ret ~= nil then
             print("WARNING: " .. ret.error)
         end
@@ -113,8 +113,8 @@ World = Class{
 
 
 
-        -- RELAY 1
-        local ret = Relay.startPlacingRelay( self, c.PLAYER_1, Vector(3,2), "W")
+        -- RELAY 3
+        local ret = Relay.startPlacingRelay( self, c.PLAYER_1, Vector(1,4), "NE")
         if ret ~= nil then
             print("WARNING: " .. ret.error)
         end
@@ -313,12 +313,13 @@ World = Class{
 
         -- From world coordinates to hex coordinates
         cx, cy = HXM.getHexFromPixel(px, py, c.Tiles.TILE_RADIUS, 0, 0)
-        print("you selected tile (", cx, ", ", cy, ")")
-		print("selected tile is ", hexamath.Distance(cx, cy, 0, 0), " from origin")
 
         -- one indexed. ONE INDEXED
         cx = cx+1
         cy = cy+1
+
+        print("you selected tile (", cx, ", ", cy, ")")
+		print("selected tile is ", hexamath.Distance(cx, cy, 0, 0), " from origin")
 
         -- avoid out-of-bounds
         if self:outOfBounds(cx, cy) then
@@ -365,6 +366,9 @@ World = Class{
         if t - self.time_since_last_tick > c.TICK_LENGTH then
             self.time_since_last_tick = t
             for playerId, data in pairs(self.player_data) do
+                for relayId, relay in pairs(data.relays) do
+                    relay:update( dt )
+                end
                 --Relay.updateSheepingRoutes(data.relays)
             end
         end

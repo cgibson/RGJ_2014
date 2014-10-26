@@ -14,6 +14,7 @@ Relay = Class {
         self.direction =                direction
         self.hp =                       c.Entities.RELAY_HP_MAX
         self.buffer =                   0           -- The amount of sheep the relay needs to expel
+        self.out_buffer =                0           -- Sheeping and sending
         self.state =                    STATE_IDLE
         self.owner =                    owner
         self.enabled =                  true
@@ -25,7 +26,7 @@ Relay = Class {
     end,
 
 
-    update = function( dt )
+    update = function( self, dt )
 
         -- Remove the relay from the world if its HP is below 1
         if self.hp < 1 then
@@ -35,29 +36,47 @@ Relay = Class {
 
         -- Only enable once the buffer holds enough sheep. Deduct the cost
         if self.state == STATE_BUILDING then
-            if self.buffer > c.Entities.RELAY_COST then
+            if self.buffer >= c.Entities.RELAY_COST then
                 self:changeState(STATE_IDLE)
                 self.buffer = self.buffer - c.Entities.RELAY_COST
             end
             return
         end
+
+        self:sendSheep()
+
+
+        -- Reset buffer
+        -- Move your sheeping receiving into the main buffer
+        self.out_buffer = self.out_buffer + self.buffer
+        self.buffer = 0
     end,
 
 
     sendSheep = function( self )
 
+        print("Relay " .. self.id .. " attempting to send sheep")
         -- Skip the rest if the relay is not enabled
         if enabled == false then
+            print(" disabled... ")
             return
         end
 
         -- Bail out if you have no target
-        if target == nil then
+        if self.target == nil then
+            print(" No target... ")
+            return
+        end
+
+        -- If we don't have anything in our buffer
+        if self.out_buffer < 1 then
+            print("Nothing in our buffer")
             return
         end
 
 
         if self.target:canReceiveSheep() == false then
+            print("target " .. self.target.id .. " can't receive sheep")
             return
         end
 
@@ -65,20 +84,32 @@ Relay = Class {
         -- TODO: this
 
         -- Send your buffer to your target
-        self.target.buffer = self.target.buffer + self.buffer
-
-        -- Reset buffer
-        self.buffer = 0
+        self.target.buffer = self.target.buffer + self.out_buffer
+        self.out_buffer = 0
     end,
 
 
-    canReceiveSheep = function( self )
+    canReceiveSheep = function( self, prev )
+        if prev == nil then
+            prev = {}
+        end
+
+        -- Check to ensure we aren't in an infinite loop.
+        -- If CRAZY CHAN is enabled, then... meh... let's do it
+        for relayId, relay in pairs(prev) do
+            if relayId == self.id then
+                return c.CRAZY_CHAN_MODE
+            end
+        end
+        -- Add ourselves to the list
+        prev[self.id] = self
+
         if self.target == nil then
             return false
         end
 
-        if target.type == c.Entities.TYPE_RELAY then
-            return target.canReceiveSheep()
+        if self.target.type == c.Entities.TYPE_RELAY then
+            return self.target:canReceiveSheep(prev)
         end
 
         return true
@@ -118,7 +149,7 @@ Relay = Class {
                 if obj ~= nil then
                     print("Relay " .. self.id .. " targeting other relay " .. obj.id .. " on " .. coord.x .. "," .. coord.y)
                     self.target = obj
-                    break
+                    return
                 end
 
                 -- If it's a planet, then duh we send stuff there
@@ -126,7 +157,7 @@ Relay = Class {
                 if obj ~= nil then
                     print("Relay " .. self.id .. " targeting planet on " .. coord.x .. "," .. coord.y)
                     self.target = obj
-                    break
+                    return
                 end
             end
         end
@@ -172,6 +203,7 @@ Relay = Class {
 
         love.graphics.setColor(255,255,255)
         love.graphics.print("B: " .. self.buffer, coord.x-8, coord.y+16)
+        love.graphics.print("BO: " .. self.out_buffer, coord.x-8, coord.y+24)
     end
 
 
