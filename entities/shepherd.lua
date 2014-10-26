@@ -98,16 +98,18 @@ Shepherd = Class {
 
 
     move_action = function( self, move_to )
-        self.state = STATE_MOVING
-        self.time_since_last_move = love.timer.getTime()
-        self.to_build = nil -- We no longer want to build whatever we might have been assigned to build
+        if self.position ~= move_to then
+            self.state = STATE_MOVING
+            self.time_since_last_move = love.timer.getTime()
+            self.to_build = nil -- We no longer want to build whatever we might have been assigned to build
 
-        -- Build path to the destination
-        -- Set it to current_path
+            -- Build path to the destination
+            -- Set it to current_path
 
-        self.current_path = hexamath.CalculatePath( self.world, self.position, move_to ) 
-        print("path length: ", #self.current_path)
-        for key,value in pairs(self.current_path) do print("   ", key,value) end
+            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to ) 
+            print("path length: ", #self.current_path)
+            for key,value in pairs(self.current_path) do print("   ", key,value) end
+        end
     end,
 
 

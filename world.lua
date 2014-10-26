@@ -66,6 +66,10 @@ World = Class{
         end
 
         self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
+        
+        for i = 3, 8 do
+            self.hexGrid.grid[i][i] = nil
+        end
 
         self.shepherd = Shepherd( self, Vector(1,1))
 
