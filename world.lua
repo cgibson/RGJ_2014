@@ -136,6 +136,9 @@ World = Class{
 
 
     getTile = function( self, pos )
+        if self:outOfBounds(pos.x, pos.y) then
+            return nil
+        end
         return self.hexGrid.grid[pos.y][pos.x]
     end,
 
@@ -379,10 +382,16 @@ World = Class{
         -- print("input:  ", cx, ", ", cy)
         -- print("bounds: ", self.bounds.xmin, " -> ", self.bounds.xmax)
         -- print("        ", self.bounds.ymin, " -> ", self.bounds.ymax)
-        return (cx < self.bounds.xmin) or
+        if (cx < self.bounds.xmin) or
                (cx > self.bounds.xmax) or
                (cy < self.bounds.ymin) or
-               (cy > self.bounds.ymax)
+               (cy > self.bounds.ymax) then
+            return true
+        elseif self.hexGrid.grid[cy][cx] == nil then
+            return true
+        else
+            return false
+        end
     end,
 
 

@@ -194,17 +194,33 @@ Relay = Class {
         else
             love.graphics.setColor(100,40,100)
         end
-        love.graphics.rectangle("fill",
-                                coord.x - 16,
-                                coord.y - 16,
-                                32,
-                                32)
+        vertexes = self:getDirectionVertexes(self.direction)
+        love.graphics.polygon("fill", coord.x + vertexes[1], coord.y + vertexes[2], 
+                                      coord.x + vertexes[3], coord.y + vertexes[4], 
+                                      coord.x + vertexes[5], coord.y + vertexes[6])
+        --love.graphics.rectangle("fill",
+        --                        coord.x - 16,
+        --                        coord.y - 16,
+        --                        32,
+        --                        32)
 
 
         love.graphics.setColor(255,255,255)
         love.graphics.print("B: " .. self.buffer, coord.x-8, coord.y+16)
         love.graphics.print("BO: " .. self.out_buffer, coord.x-8, coord.y+24)
+    end,
+    
+    getDirectionVertexes = function(self, vertex)
+        if vertex == "NE" then return {-18,0 , 15,15 , 15,-15}
+        elseif vertex == "E" then return {18,0 , -15,-15 , 15,15}
+        elseif vertex == "SE" then return {-18,0 , 15,15 , 15,-15}
+        elseif vertex == "SW" then return {18,0 , -15,-15 , 15,15}
+        elseif vertex == "W" then return {-18,0 , 15,15 , 15,-15}
+        elseif vertex == "NW" then return {18,0 , -15,-15 , 15,15}
+        end
     end
+    
+    
 
 
 }

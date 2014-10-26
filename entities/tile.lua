@@ -27,7 +27,11 @@ Tile = Class{
 		-- Space
 		-- Planet
 		-- Impassable
-		self.type = c.Tiles.TYPE_SPACE
+        if math.random(1,5) == 1 then
+            self.type = c.Tiles.TYPE_ASTEROID
+        else
+            self.type = c.Tiles.TYPE_SPACE
+        end
 		
 		-- Type of event on this tile
 		self.event_type = c.Events.NONE
@@ -46,10 +50,28 @@ Tile = Class{
         --
         -- Indexed by player id
 		self.explored = {false, false, false, false }
+        
+        -- Indexed by player id
+        self.owner = 0
 
         self.entities = {}
     end,
 
+    update = function( self )
+        if self.owner == 1 then self.color = c.Colors.HEX_BLUE
+        elseif self.explored[1] == false then self.color = c.Colors.HEX_BLACK
+        elseif self.explored[1] == true then
+            if self.type == c.Tiles.TYPE_ASTEROID then self.color = c.Colors.HEX_WHITE
+            elseif self.owner ~= 0 then self.color = c.Colors.HEX_YELLOW
+            else self.color = c.Colors.HEX_GREY
+            end
+        end
+    end,
+    
+    explore = function( self, playerId )
+        self.explored[playerId] = true
+        self:update()
+    end,
 
     getRelay = function( self )
 
@@ -137,15 +159,18 @@ function Tile:draw(x, y)
     end
 end
 
-function Tile:getWeight( playerId )
-    if self.type == c.Tiles.TYPE_ASTEROID then
+function Tile:getWeight( playerId , retreat)
+    if self.explored[playerId] == false then
+        if retreat then
+            return 9999
+        end
+        return 3
+    elseif self.type == c.Tiles.TYPE_ASTEROID then
         return 9999
     elseif self.relayCount[playerId] > 0 then
         return 1
-    elseif self.explored[playerId] == true then
-        return 2
     else
-        return 3
+        return 2
     end
 end
 

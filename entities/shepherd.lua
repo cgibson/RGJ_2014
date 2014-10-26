@@ -11,9 +11,11 @@ Shepherd = Class {
     init = function( self, world, pos )
         self.id =                       c.getNewId()
         self.type =                     c.Entities.TYPE_SHEPHERD
+        self.hp =                       50
         self.world =                    world       -- Copy of the world (for movement/placement)
         self.position =                 pos
         self.current_path =             {}
+        self.destination =              pos
         self.speed =                    1           -- Speed (blocks/sec)
         self.time_since_last_action =   0           -- Time since last movement
                                                     -- TODO: we should replace this with a tween sooner or later
@@ -25,6 +27,7 @@ Shepherd = Class {
 
         self.state =                    STATE_IDLE  -- idle, building, moving, retreating
         self.selected =                 false
+        self:scanTiles( self.hp, self.position )
     end,
 
 
@@ -41,24 +44,26 @@ Shepherd = Class {
         if self.state == STATE_MOVING then
             if t - self.time_since_last_action > self.speed then
                 -- Pop the next point along the path from the FiFo and move the shepherd
-                self:do_move(self.position, table.remove(self.current_path, 1))
-                
-                -- Reset time last moved
-                self.time_since_last_action = t
+                if self:do_move(self.position, table.remove(self.current_path, 1)) == false then
+                    self:emergency_stop()
+                else
+                    -- Reset time last moved
+                    self.time_since_last_action = t
 
-                -- If we currently are at the end of our current path, then we're dun
-                --
-                if #self.current_path < 1 then
-
-                    -- If we have something to build, then start building it
+                    -- If we currently are at the end of our current path, then we're dun
                     --
-                    if self.to_build ~= nil then
-                        self.time_since_last_action = love.timer.getTime()
-                        -- Update state to BUILDING
-                        self.state = STATE_BUILDING
-                    else
-                        -- Otherwise, we're idle
-                        self.state = STATE_IDLE
+                    if #self.current_path < 1 then
+
+                        -- If we have something to build, then start building it
+                        --
+                        if self.to_build ~= nil then
+                            self.time_since_last_action = love.timer.getTime()
+                            -- Update state to BUILDING
+                            self.state = STATE_BUILDING
+                        else
+                            -- Otherwise, we're idle
+                            self.state = STATE_IDLE
+                        end
                     end
                 end
             end
@@ -74,6 +79,11 @@ Shepherd = Class {
         end
     end,
     
+    emergency_stop = function (self, pos )
+        self.current_path = {}
+        self.state = STATE_IDLE
+    end,
+    
     is_on_path = function( self, pos)
         for _,v in pairs(self.current_path) do
             if v == pos then
@@ -87,26 +97,62 @@ Shepherd = Class {
     -- Internal movement function
     --
     do_move = function( self, old_pos, new_pos )
+        local oldTile = self.world:getTile(old_pos)
+        local newTile = self.world:getTile(new_pos)
+        if self.hp == 0 and newTile.explored[c.PLAYER_1] == false then
+            return false
+        end
+        if newTile.type == c.Tiles.TYPE_ASTEROID then
+            newTile:explore(c.PLAYER_1)
+            self.hp = self.hp - 1
+            return false
+        end
         self.position = new_pos
-
-        local tile = self.world:getTile(old_pos)
-        tile:removeEntity(self)
-
-        tile = self.world:getTile(new_pos)
-        tile:addEntity(self)
+        oldTile:removeEntity(self)
+        newTile:addEntity(self)
+        self:scanTiles(self.hp, new_pos)
+        return true
     end,
 
-
+    scanTiles = function( self, hp, pos )
+        scanTile = self.world:getTile(pos)
+        if scanTile ~= nil then
+            scanTile:explore(c.PLAYER_1)
+            print("Using", self.hp, "to reveal", scanTile)
+            self.hp = self.hp - 1
+        end
+        for k,v in pairs(c.DIRECTIONS) do
+            sensor_x = pos.x
+            sensor_y = pos.y
+            for i=1, math.min(hp/10, 2) do
+                x, y = HXM.getHexCoordinate(v, sensor_x, sensor_y)
+                newVector = Vector(x, y)
+                scanTile = self.world:getTile(newVector)
+                if scanTile ~= nil and scanTile.explored[c.PLAYER_1] == false then
+                    scanTile:explore(c.PLAYER_1)
+                    print("Using", self.hp, "to reveal", scanTile)
+                    self.hp = self.hp - 1
+                    if scanTile.type == c.Tiles.TYPE_ASTEROID and self:is_on_path( newVector ) then
+                        self:move_action( self.destination )
+                    end
+                end
+                sensor_x = x
+                sensor_y = y
+            end
+        end
+    end,
+    
     move_action = function( self, move_to )
         if self.position ~= move_to then
             self.state = STATE_MOVING
+            self.destination = move_to
             self.time_since_last_move = love.timer.getTime()
             self.to_build = nil -- We no longer want to build whatever we might have been assigned to build
 
             -- Build path to the destination
             -- Set it to current_path
 
-            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to ) 
+            self.current_path = hexamath.CalculatePath( self.world, self.position, move_to, self.hp == 0) 
             print("path length: ", #self.current_path)
             for key,value in pairs(self.current_path) do print("   ", key,value) end
         end
@@ -122,7 +168,8 @@ Shepherd = Class {
                                 coord.y - (self.height / 2),
                                 self.width,
                                 self.height)
-
+        love.graphics.setColor(255,0,0)
+        love.graphics.print("HP: " .. self.hp, coord.x, coord.y)
         self:drawPath()
     end,
 

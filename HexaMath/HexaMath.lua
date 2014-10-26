@@ -1,8 +1,8 @@
 local hexamath = {}
 HXM = require "HexaMoon.HexaMoon"
+c = require "constants"
 local grid_memo = {}
 local grid_cost = {}
-local directions = {"NE", "E", "SE", "SW", "W", "NW"}
 
 function hexamath.createMemo (width, height)
     grid_memo = HXM.createRectGrid(width, height, 0)
@@ -21,7 +21,7 @@ function hexamath.VectorDistance(h1, h2)
 	return (math.abs(h1_x - h2_x) + math.abs(h1_y - h2_y) + math.abs(h1_x + h1_y - h2_x - h2_y)) / 2
 end
 
-function hexamath.CalculatePath( world, vector1, vector2 )
+function hexamath.CalculatePath( world, vector1, vector2, retreat )
     -- return {Vector(1,2), Vector(1,3), Vector(1,4)}
     frontier = {}
     grid_memo = {}
@@ -33,19 +33,19 @@ function hexamath.CalculatePath( world, vector1, vector2 )
     grid_cost[vector1.x .. "," .. vector1.y] = 0
     frontier_i = table.remove(frontier, 1)
     while frontier_i ~= nil do
-        for k,v in pairs(directions) do
+        for k,v in pairs(c.DIRECTIONS) do
             x, y = HXM.getHexCoordinate(v, frontier_i.x, frontier_i.y)
             newVector = Vector(x, y)
             newVectorId = x .. "," .. y
             if world:outOfBounds(newVector.x, newVector.y) == false and grid_memo[newVectorId] == nil and world:getTile(newVector) ~= nil then
-                print("Adding to frontier", newVectorId, "->", frontier_i)
+                --print("Adding to frontier", newVectorId, "->", frontier_i)
                 grid_memo[newVectorId] = frontier_i
                 newTile = world:getTile(newVector)
                 if newTile ~= nil then
                     newTile.selected = true
                 end
                 grid_cost[newVectorId] = grid_cost[frontier_i.x .. "," .. frontier_i.y]
-                grid_cost[newVectorId] = grid_cost[newVectorId] + newTile:getWeight(1)
+                grid_cost[newVectorId] = grid_cost[newVectorId] + newTile:getWeight(1, retreat)
                 if newVector == vector2 then
                     --print("OH DEAR GOD I FOUND IT")
                     --for k2,v2 in pairs(grid_memo) do
@@ -53,7 +53,7 @@ function hexamath.CalculatePath( world, vector1, vector2 )
                     --end
                     returnPath = {}
                     while newVector ~= vector1 do
-                        print("Backtracking", newVector, "to", grid_memo[newVectorId])
+                        --print("Backtracking", newVector, "to", grid_memo[newVectorId])
                         table.insert(returnPath, 1, newVector)
                         newVector = grid_memo[newVectorId]
                         newVectorId = newVector.x .. "," .. newVector.y
