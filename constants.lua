@@ -47,6 +47,8 @@ Constants = {
         RELAY_HP_MAX = 10,
         RELAY_DISTANCE_MAX = 5,
 
+        RELAY_COST = 100,
+
         TYPE_SHEPHERD = 0,
         TYPE_RELAY = 1
     },

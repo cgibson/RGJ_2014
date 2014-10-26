@@ -96,7 +96,7 @@ Tile = Class{
 
     getBackground = function( self )
         if #self.entities > 0 then
-            return {80, 150, 80 }
+            return {20, 70, 20 }
         else
             return self.color
         end

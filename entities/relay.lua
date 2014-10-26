@@ -13,6 +13,7 @@ Relay = Class {
         self.position =                 pos
         self.direction =                direction
         self.hp =                       c.Entities.RELAY_HP_MAX
+        self.buffer =                   0           -- The amount of sheep the relay needs to expel
         self.state =                    STATE_IDLE
         self.owner =                    owner
         self.enabled =                  true
@@ -26,11 +27,62 @@ Relay = Class {
 
     update = function( dt )
 
-        -- Identify closest object along the line that can accept sheep
-        local closest = self:findClosestSheepReceiver()
-        -- Check to ensure the object can continue to accept sheep
+        -- Remove the relay from the world if its HP is below 1
+        if self.hp < 1 then
+            world.player_data[owner].relays[self.id] = nil
+            return
+        end
 
-        -- Turn off if sheep cannot be accepted
+        -- Only enable once the buffer holds enough sheep. Deduct the cost
+        if self.state == STATE_BUILDING then
+            if self.buffer > c.Entities.RELAY_COST then
+                self:changeState(STATE_IDLE)
+                self.buffer = self.buffer - c.Entities.RELAY_COST
+            end
+            return
+        end
+    end,
+
+
+    sendSheep = function( self )
+
+        -- Skip the rest if the relay is not enabled
+        if enabled == false then
+            return
+        end
+
+        -- Bail out if you have no target
+        if target == nil then
+            return
+        end
+
+
+        if self.target:canReceiveSheep() == false then
+            return
+        end
+
+        -- Scoop an amount of sheep off the planet you're next to (if such exists)
+        -- TODO: this
+
+        -- Send your buffer to your target
+        self.target.buffer = self.target.buffer + self.buffer
+
+        -- Reset buffer
+        self.buffer = 0
+    end,
+
+
+    canReceiveSheep = function( self )
+        if self.target == nil then
+            return false
+        end
+
+        if target.type == c.Entities.TYPE_RELAY then
+            return target.canReceiveSheep()
+        end
+
+        return true
+
     end,
 
 
@@ -50,6 +102,7 @@ Relay = Class {
 
 
     updateTarget = function( self )
+        print("UPDATING TARGET for relay " .. self.id)
         local coord = self.position
         local tile, obj
         for dist = 1, c.Entities.RELAY_DISTANCE_MAX do
@@ -59,20 +112,22 @@ Relay = Class {
             tile = self.world:getTile(Vector(x, y))
             coord = Vector(x, y)
 
-            -- We don't even care who's relay this is. If it exists, we point and shoot
-            obj = tile.getRelay()
-            if obj ~= nil then
-                print("Relay " .. self.id .. " targeting other relay " .. obj.id .. " on " .. tile.position.x .. "," .. tile.position.y)
-                self.target = obj
-                break
-            end
+            if tile ~= nil then
+                -- We don't even care who's relay this is. If it exists, we point and shoot
+                obj = tile:getRelay()
+                if obj ~= nil then
+                    print("Relay " .. self.id .. " targeting other relay " .. obj.id .. " on " .. coord.x .. "," .. coord.y)
+                    self.target = obj
+                    break
+                end
 
-            -- If it's a planet, then duh we send stuff there
-            obj = tile.getPlanet()
-            if obj ~= nil then
-                print("Relay " .. self.id .. " targeting planet on " .. tile.position.x .. "," .. tile.position.y)
-                self.target = obj
-                break
+                -- If it's a planet, then duh we send stuff there
+                obj = tile:getPlanet()
+                if obj ~= nil then
+                    print("Relay " .. self.id .. " targeting planet on " .. coord.x .. "," .. coord.y)
+                    self.target = obj
+                    break
+                end
             end
         end
 
@@ -94,13 +149,39 @@ Relay = Class {
     end,
 
 
+    draw = function( self )
+
+        -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
+        local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.position.x-1, self.position.y-1, 0, 0)
+
+        if self.state == STATE_PLACING then
+            love.graphics.setColor(255,255,255)
+        elseif self.state == STATE_BUILDING then
+            love.graphics.setColor(100,100,100)
+        elseif self.target ~= nil then
+            love.graphics.setColor(150,0,150)
+        else
+            love.graphics.setColor(100,40,100)
+        end
+        love.graphics.rectangle("fill",
+                                coord.x - 16,
+                                coord.y - 16,
+                                32,
+                                32)
+
+
+        love.graphics.setColor(255,255,255)
+        love.graphics.print("B: " .. self.buffer, coord.x-8, coord.y+16)
+    end
+
+
 }
 
 
-function Relay.placeRelay(world, owner, pos, direction)
+function Relay.startPlacingRelay(world, playerId, pos, direction)
 
     -- Ensure the tile exists
-    local tile = self.world:getTile( pos )
+    local tile = world:getTile( pos )
     if tile == nil then
         return {error="Cannot build there!"}
     end
@@ -120,33 +201,43 @@ function Relay.placeRelay(world, owner, pos, direction)
         return {error="Cannot place a rely on a planet"}
     end
 
+    -- Must place on a tile that can receive sheep
+    -- TODO: this.
+
     -- First, place the tile in the world
-    local relay = Relay(world, owner, pos, direction)
+    local relay = Relay(world, playerId, pos, direction)
 
     -- Set its state to BUILDING. It hasn't been built yet
-    relay:setState(STATE_PLACING)
+    relay:changeState(STATE_PLACING)
 
     -- Tell the world the player is trying to place this relay
-    world.player_data[owner].is_placing = true
-    world.player_date[owner].relay_to_build = relay
+    world.player_data[playerId].is_placing = true
+    world.player_data[playerId].relay_to_build = relay
 
     -- We DON'T add it to the actual grid yet. We don't want it
     -- to screw up anyone's calculations
+
+    -- Add to player data to receive updates and draws
+    world.player_data[playerId].relays[#world.player_data[playerId].relays+1] = relay
+
+    return nil
 end
 
 
-function Relay.buildRelay( world, playerId )
+function Relay.buildPendingRelay( world, playerId, freeSheep )
     print("Building relay for player " .. playerId)
 
     -- Grab the relay from player data
     local relay = world.player_data[playerId].relay_to_build
 
+    -- Give them free sheep. SPACE SHEEP LIVES
+    if freeSheep ~= nil then
+        relay.buffer = freeSheep
+    end
+
     -- Insert the relay into the tile
     local tile = world:getTile( relay.position )
     tile:addEntity(relay)
-
-    -- Add to player data
-    world.player_data.player_1.relays[#world.player-data[playerId].relays+1] = relay
 
     -- STEP 1: Check to see who is the 'target' for this relay
     --         This can be a relay or a planet.
@@ -159,7 +250,7 @@ function Relay.buildRelay( world, playerId )
     -- Set relay's state to STATE_BUILDING. It still needs to be
     -- built before it can be operational. Once its sheep reserve
     -- is full, it will be set into an operational state
-    relay:setState(STATE_BUILDING)
+    relay:changeState(STATE_BUILDING)
 
     -- Let the game know we are no longer placing the relay
     world.player_data[playerId].is_placing = false

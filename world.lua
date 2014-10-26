@@ -41,18 +41,24 @@ World = Class{
         -- Contains information about each player and the entities they control
         self.player_data = {}
 
-            -- User
+        -- User
         self.player_data[c.PLAYER_1] = {
-                relays = {},
-                shepherd = nil,
-                selection = nil
+            relays = {},
+            shepherd = nil,
+            selection = nil,
+
+            is_placing = false,
+            relay_to_build = nil
         }
 
-            -- Enemy (AI for now)
-        self.player_data[c.PLAYER_1] = {
-                relays = {},
-                shepherd = nil,
-                selection = nil
+        -- Enemy (AI for now)
+        self.player_data[c.PLAYER_2] = {
+            relays = {},
+            shepherd = nil,
+            selection = nil,
+
+            is_placing = false,
+            relay_to_build = nil
         }
 
         -- TODO: Fancy generation things
@@ -77,11 +83,47 @@ World = Class{
 
         self.player_data[c.PLAYER_1].shepherd = self.shepherd
 
-        --local relay1 = Relay( self, c.PLAYER_1, Vector(3, 1), "W")
-        --self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay1
 
-        --local relay2 = Relay( self, c.PLAYER_1, Vector(5, 2), "W")
-        --self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay2
+
+        -- RELAY 1
+        local ret = Relay.startPlacingRelay( self, c.PLAYER_1, Vector(3,2), "W")
+        if ret ~= nil then
+            print("WARNING: " .. ret.error)
+        end
+
+
+        ret = Relay.buildPendingRelay( self, c.PLAYER_1, c.Entities.RELAY_COST )
+        if ret ~= nil then
+            print("WARNING: " .. ret.error)
+        end
+
+
+
+        -- RELAY 2
+        ret = Relay.startPlacingRelay( self, c.PLAYER_1, Vector(1,2), "SE")
+        if ret ~= nil then
+            print("WARNING: " .. ret.error)
+        end
+
+
+        ret = Relay.buildPendingRelay( self, c.PLAYER_1 )
+        if ret ~= nil then
+            print("WARNING: " .. ret.error)
+        end
+
+
+
+        -- RELAY 1
+        local ret = Relay.startPlacingRelay( self, c.PLAYER_1, Vector(3,2), "W")
+        if ret ~= nil then
+            print("WARNING: " .. ret.error)
+        end
+
+
+        local ret = Relay.buildPendingRelay( self, c.PLAYER_1 )
+        if ret ~= nil then
+            print("WARNING: " .. ret.error)
+        end
 
 
 
@@ -233,12 +275,13 @@ World = Class{
 
         -- From world coordinates to hex coordinates
         cx, cy = HXM.getHexFromPixel(px, py, c.Tiles.TILE_RADIUS, 0, 0)
-        print("you selected tile (", cx, ", ", cy, ")")
-		print("selected tile is ", hexamath.Distance(cx, cy, 0, 0), " from origin")
 
         -- one indexed. ONE INDEXED
         cx = cx+1
         cy = cy+1
+
+        print("you selected tile (", cx, ", ", cy, ")")
+		print("selected tile is ", hexamath.Distance(cx, cy, 0, 0), " from origin")
 
         -- avoid out-of-bounds
         if self:outOfBounds(cx, cy) then
