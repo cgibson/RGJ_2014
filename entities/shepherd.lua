@@ -104,12 +104,12 @@ Shepherd = Class {
         end
         if newTile.type == c.Tiles.TYPE_ASTEROID then
             newTile:explore(c.PLAYER_1)
+            self.hp = self.hp - 1
             return false
         end
         self.position = new_pos
         oldTile:removeEntity(self)
         newTile:addEntity(self)
-        
         self:scanTiles(self.hp, new_pos)
         return true
     end,
