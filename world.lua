@@ -31,7 +31,7 @@ World = Class{
     init = function( self, width, height )
         self.width = width      -- Width of grid
         self.height = height    -- Height of grid
-	    self.hexGrid = HXM.createRectGrid(width, height, 0)
+	    self.grid = HXM.createRectGrid(width, height, 0)
 
         -- TODO: Fancy generation things
         -- START FANCY DEBUG TIME
@@ -43,14 +43,14 @@ World = Class{
         self:setTile( 1, 3, Tile() )
         self:setTile( 1, 4, Tile() )
 
-        self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
+        self.grid.grid[1][1].type = c.Tiles.TYPE_PLANET
         -- END FANCY DEBUG TIME
 
         self.offset = {0, 0}
     end,
 
     setTile = function( self, cx, cy, obj )
-        self.hexGrid.grid[cy][cx] = obj
+        self.grid.grid[cy][cx] = obj
     end,
 
 
@@ -67,16 +67,16 @@ World = Class{
         love.graphics.setLineWidth(1)
 
         -- Draw base grid and backgrounds
-        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_BASE})
+        HXM.drawRectGridX(self.grid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_BASE})
 
         -- Draw boundary grid
         -- TODO
 
         -- Draw selected grids
-        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_SELECTED})
+        HXM.drawRectGridX(self.grid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_SELECTED})
 
         -- Draw contents
-        HXM.drawRectGridX(self.hexGrid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_CONTENTS})
+        HXM.drawRectGridX(self.grid, self.drawHexagon, TILE_RADIUS, self.offset[1], self.offset[2], {mode=HEX_DRAW_CONTENTS})
 
     end,
 
@@ -158,12 +158,12 @@ World = Class{
     -- SELECT TILE function
     --
     -- Given a world x and y value, find the correct
-    -- hexagon index in self.hexGrid and select it
+    -- hexagon index in self.grid and select it
     --
     selectTile = function(self, px, py)
 
         -- From world coordinates to hex coordinates
-        cx, cy = HXM.getHexFromPixel(px, py, TILE_RADIUS, self.offset[1], self.offset[2])
+        local cx, cy = HXM.getHexFromPixel(px, py, TILE_RADIUS, self.offset[1], self.offset[2])
         print("you selected tile (", cx, ", ", cy, ")")
 		print("selected tile is ", hexamath.Distance(cx, cy, 0, 0), " from origin")
 
@@ -174,13 +174,13 @@ World = Class{
         -- TODO: avoid out-of-bounds
 
         -- Non-tiles should be skipped
-        if self.hexGrid.grid[cy][cx] == 0 then
+        if self.grid.grid[cy][cx] == 0 then
             print("You selected an empty tile you doofus!")
             return
         end
 
         -- TODO: instead of toggling, we should only have one selected tile at once
-        self.hexGrid.grid[cy][cx].selected = (self.hexGrid.grid[cy][cx].selected == false)
+        self.grid.grid[cy][cx].selected = (self.grid.grid[cy][cx].selected == false)
     end
 }
 
