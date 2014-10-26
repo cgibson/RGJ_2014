@@ -36,13 +36,17 @@ Tile = Class{
 		-- When a new relay is created, ++ to all tiles in range
 		-- When a relay is destroyed, -- to all tiles in range
 		-- If relayCount > 0, weight to travel through is 1
-		self.relayCount = 0
+        --
+        -- Indexed by player id
+		self.relayCount = {0, 0, 0, 0}
 		
 		-- Has this tile been explored by the player?
 		-- If yes, weight to travel through is 2
 		-- If no, weight to travel through is 3
-		self.explored = false
-    end
+        --
+        -- Indexed by player id
+		self.explored = {false, false, false, false}
+    end,
 }
 
 function Tile:draw(x, y)
@@ -52,12 +56,12 @@ function Tile:draw(x, y)
     end
 end
 
-function Tile:getWeight()
+function Tile:getWeight( playerId )
     if self.type == c.Tiles.TYPE_ASTEROID then
         return 9999
-    elseif self.relayCount > 0 then
+    elseif self.relayCount[playerId] > 0 then
         return 1
-    elseif self.explored == true then
+    elseif self.explored[playerId] == true then
         return 2
     else
         return 3
