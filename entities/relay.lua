@@ -215,7 +215,12 @@ Relay = Class {
 
         -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
         local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.position.x-1, self.position.y-1, 0, 0)
-        love.graphics.setColor(255,0,255)
+
+        if self.memoization.can_send then
+            love.graphics.setColor(150,0,150)
+        else
+            love.graphics.setColor(150,0,150)
+        end
         love.graphics.rectangle("fill",
                                 coord.x - 16,
                                 coord.y - 16,

@@ -52,10 +52,11 @@ Tile = Class{
 
 
     getRelay = function( self )
-        for i = 1, #self.entities do
+
+        for id, obj in pairs(self.entities) do
             -- There should only ever be one rely on a space
-            if self.entities[i].type == c.Entities.TYPE_RELAY then
-                return self.entities[i]
+            if obj.type == c.Entities.TYPE_RELAY then
+                return obj
             end
         end
     end,
@@ -63,9 +64,9 @@ Tile = Class{
 
     getShepherds = function( self )
         local shepherds = {}
-        for i = 1, #self.entities do
-            if self.entities[i].type == c.Entities.TYPE_SHEPHERD then
-                shepherds[#shepherds+1] = self.entities[i]
+        for id, obj in pairs(self.entities) do
+            if obj.type == c.Entities.TYPE_SHEPHERD then
+                shepherds[#shepherds+1] = obj
             end
         end
 

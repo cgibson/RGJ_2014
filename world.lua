@@ -77,6 +77,9 @@ World = Class{
         local relay1 = Relay( self, c.PLAYER_1, Vector(3, 1), "W")
         self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay1
 
+        local relay2 = Relay( self, c.PLAYER_1, Vector(5, 2), "W")
+        self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay2
+
         print("NUMBER OF RELAYS: ", #self.playerData.player_1.relays)
 
 
@@ -310,6 +313,7 @@ World = Class{
     -- Updates the entire world and everything in it. This is considered one "tick"
     --
     update = function(self, dt)
+        print("", Vector(55,55))
         t = love.timer.getTime()
 
         for playerId, data in pairs(self.playerData) do
