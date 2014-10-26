@@ -79,6 +79,8 @@ function Game:mousereleased( x, y, mouse )
             self.world:selectTile(wx, wy)
         end
     elseif mouse == c.MOUSE_BUTTON_RIGHT then
+        wx, wy = self.camera:worldCoords(x, y)
+        self.world:rightSelectTile(wx, wy)
     end
 end
 
