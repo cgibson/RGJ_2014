@@ -35,7 +35,7 @@ World = Class{
 
         self.bounds = self:getBounds()
 
-	    self.hexGrid = HXM.createRectGrid(width, height, 0)
+	    self.hexGrid = HXM.createRectGrid(width, height, nil)
         hexamath.createMemo( width, height )
 
         -- Contains information about each player and the entities they control
@@ -150,6 +150,10 @@ World = Class{
             obj = empty_tile
             --return
         end
+
+        print("------")
+        for k,v in pairs(obj) do print(k,v) end
+        print("-----")
 
         -- Draw the base hex grid
         --

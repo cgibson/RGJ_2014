@@ -65,7 +65,7 @@ Tile = Class{
         local shepherds = {}
         for i = 1, #self.entities do
             if self.entities[i].type == c.Entities.TYPE_SHEPHERD then
-                shepherds[#sheperds+1] = self.entities[i]
+                shepherds[#shepherds+1] = self.entities[i]
             end
         end
 

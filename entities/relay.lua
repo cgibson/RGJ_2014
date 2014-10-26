@@ -43,7 +43,7 @@ Relay = Class {
 
     updateSheepingCapability = function( self, prev )
 
-        print("CHECKING (",self.id,") for sheeping capability")
+        -- print("CHECKING (",self.id,") for sheeping capability")
         -- instantiate if not given
         if prev == nil then
             prev = {self}
@@ -51,13 +51,13 @@ Relay = Class {
 
         -- Memoization!
         if self.memoization.can_send ~= nil then
-            print(self.id, "    memoized (", self.memoization.can_send, ")")
+            -- print(self.id, "    memoized (", self.memoization.can_send, ")")
             return self.memoization.can_send
         end
 
         -- First, just ignore disabled relays
         if self.enabled == false then
-            print(self.id, "   disabled! (false)")
+            -- print(self.id, "   disabled! (false)")
             self.memoization.can_send = false
             return false
         end
@@ -86,14 +86,14 @@ Relay = Class {
             prev[#prev+1] = closest
             if isRelay then
                 if closest:updateSheepingCapability(prev) then
-                    print(self.id, "   touches a sheepable relay! (true)")
+                    -- print(self.id, "   touches a sheepable relay! (true)")
                     -- If so (or memoization tells us so) then here you go!
                     self.memoization.can_send = true
                     self.memoization.receiver = closest
                     return true
                 end
             else
-                print(self.id, "   touches a destination! (true)")
+                -- print(self.id, "   touches a destination! (true)")
                 self.memoization.can_send = true
                 self.memoization.receiver = closest
                 return true
@@ -103,7 +103,7 @@ Relay = Class {
         -- Otherwise, handle reserve sheep
         -- TODO: Handle reserve sheep
 
-        print(self.id, "   no destination (false)")
+        -- print(self.id, "   no destination (false)")
         self.memoization.can_send = false
         return false
 
@@ -121,7 +121,7 @@ Relay = Class {
             tile = self.world:getTile(Vector(x, y))
             coord = Vector(x, y)
 
-            print("Anything in tile (" .. x .. "," .. y .. ")?")
+            -- print("Anything in tile (" .. x .. "," .. y .. ")?")
             if tile == nil then
                 return nil, false
             end
@@ -129,11 +129,11 @@ Relay = Class {
             --
             obj = tile:getObstacle()
             if obj ~= nil then
-                print("  There is an obstacle!")
+                -- print("  There is an obstacle!")
                 return nil, false
             end
 
-            print("  No obstacles")
+            -- print("  No obstacles")
 
             -- Grab a relay (we'll decide whether or not they're friendly later
             obj = tile:getRelay()
@@ -143,25 +143,25 @@ Relay = Class {
                     if obj.owner ~= self.owner then
                         -- We can fight it! No need to see whether or not we can receive sheep.
                         -- By virtue of its very existence we can throw sheep at it to destroy it
-                        print("  There is a relay!")
+                        -- print("  There is a relay!")
                         return obj, true
                     else
                         if obj.enabled then
                             -- Our receiver can take our sheeps
 
-                            print("  There is a relay!")
+                            -- print("  There is a relay!")
                             return obj, true
                         else
                             -- Stop right there
 
-                            print("  There is a relay, but it's enabled!")
+                            -- print("  There is a relay, but it's enabled!")
                             return nil, false
                         end
                     end
                 end
             end
 
-            print("  No relays")
+            -- print("  No relays")
 
             -- Find out if we have any shepherds on the tile, ally or otherwise
             --
@@ -176,29 +176,29 @@ Relay = Class {
                     if obj[i]:canReceiveSheep(prev) then
                         if obj[i].owner == self.owner then
 
-                            print("  There is a shepherd!")
+                            -- print("  There is a shepherd!")
                             return obj[i], false
                         end
                     end
                 end
-                print("  There is a shepherd!")
+                -- print("  There is a shepherd!")
                 return obj[1], false
             end
 
-            print("  No shepherds")
+            -- print("  No shepherds")
 
             -- Find out if we're hitting a planet. It's like getting a healthy serving of freedom... except
             -- freedom in the form of fluffy white sheep
             obj = tile:getPlanet()
             if obj ~= nil then
                 if obj:canReceiveSheep(prev) then
-                    print("  There is a planet!")
+                    -- print("  There is a planet!")
                     -- TODO: Eventually, we want to be able to indicate whether or not to attack. For now it's automatic
                     return obj, false
                 end
             end
 
-            print("  No planets")
+            -- print("  No planets")
 
             --
             -- Otherwise, keep going...
@@ -229,7 +229,7 @@ Relay = Class {
 -- Static function to run across all relays
 function Relay.updateSheepingRoutes(relays)
 
-    print("------------------------- UPDATING SHEEPING ROUTES !")
+    -- print("------------------------- UPDATING SHEEPING ROUTES !")
     -- First, clean all memoization across all relays
     for i = 1, #relays do
         relays[i]:clearMemoization()
@@ -243,7 +243,7 @@ function Relay.updateSheepingRoutes(relays)
     -- Finally, send the sheep along, attacking/defending/repairing entities
     for i = 1, #relays do
         if relays[i].memoization.can_Send then
-           print("CAN SEND FROM ", relays[i].id)
+           -- print("CAN SEND FROM ", relays[i].id)
         end
     end
 

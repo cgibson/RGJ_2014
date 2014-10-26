@@ -136,6 +136,12 @@ Shepherd = Class {
                                     20,
                                     20)
         end
+    end,
+
+
+    canReceiveSheep = function( self )
+        -- Yea, sure... why not?
+        return true
     end
 }
 

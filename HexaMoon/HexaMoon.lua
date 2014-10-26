@@ -79,7 +79,7 @@ end
 
 -- Creates rectangular shaped grid with origin at top left corner
 function hxm.createRectGrid(width, height, obj)
-	obj = obj or {__val=true}
+	-- obj = obj or {__val=true}
 	local grid = {}
 	local w = math.ceil((width-1) + (height-1)/2)
 	for y=1, height do
