@@ -105,7 +105,8 @@ Shepherd = Class {
         -- Set it to current_path
 
         self.current_path = hexamath.CalculatePath( self.world, self.position, move_to ) 
-        print("path coded as ", self.current_path[1])
+        print("path length: ", #self.current_path)
+        for key,value in pairs(self.current_path) do print("   ", key,value) end
     end,
 
 
@@ -126,7 +127,6 @@ Shepherd = Class {
     drawPath = function( self )
         love.graphics.setColor(0, 255, 0)
         for i = 1, #self.current_path do
-            print("DRAWING!")
             -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
             local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.current_path[i].x-1, self.current_path[i].y-1, 0, 0)
             love.graphics.rectangle("fill",

@@ -62,12 +62,12 @@ World = Class{
 
         self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
 
-        shepherd = Shepherd( self, Vector(1,1))
-        
+        self.shepherd = Shepherd( self, Vector(1,1))
+
         -- Hard coded shepherd path
         --shepherd:setNewPath( {Vector(1,2), Vector(1,3), Vector(1,4)} )
 
-        self.playerData.player_1.entities[#self.playerData.player_1.entities + 1] = shepherd
+        self.playerData.player_1.entities[#self.playerData.player_1.entities + 1] = self.shepherd
 
         -- END FANCY DEBUG TIME
     end,
@@ -239,8 +239,8 @@ World = Class{
         end
 
         -- TODO: instead of toggling, we should only have one selected tile at once
-        if Vector(cy, cx) == shepherd.position then
-            shepherd.selected = true
+        if Vector(cy, cx) == self.shepherd.position then
+            self.shepherd.selected = true
         else
             self.hexGrid.grid[cy][cx].selected = (self.hexGrid.grid[cy][cx].selected == false)
         end
@@ -276,8 +276,9 @@ World = Class{
         end
 
         -- If the shepherd is selected, the selected space is it's destination
-        if shepherd.selected == true then
-            shepherd.move_action( Vector(cx, cy) )
+        if self.shepherd.selected == true then
+            print("I've selected the shepherd. Time to move")
+            self.shepherd:move_action( Vector(cx, cy) )
         end
     end,
 
