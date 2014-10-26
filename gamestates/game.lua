@@ -10,7 +10,7 @@ local Game = {}
 
 
 function Game:enter()
-    self.world = World(50, 50)
+    self.world = World(10, 10)
     self.camera = Camera(0, 0)
 
     -- Mouse variables
@@ -54,7 +54,6 @@ function Game:mousepressed( x, y, mouse )
         self.camera_moving = true
         self.mouse_last_pos = {x, y}
     end
-    print("Mouse ", mouse, " pressed at location (", x, ", ", y, ")")
 end
 
 function Game:mousereleased( x, y, mouse )
@@ -71,6 +70,7 @@ end
 
 
 function Game:update(dt)
+    self.world:update(dt)
 
     -- view moving code
     if self.camera_moving then

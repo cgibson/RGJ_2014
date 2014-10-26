@@ -39,7 +39,7 @@ Tile = Class{
         --
         -- Indexed by player id
 		self.relayCount = {0, 0, 0, 0}
-		
+
 		-- Has this tile been explored by the player?
 		-- If yes, weight to travel through is 2
 		-- If no, weight to travel through is 3

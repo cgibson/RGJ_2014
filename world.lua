@@ -31,7 +31,14 @@ World = Class{
     init = function( self, width, height )
         self.width = width      -- Width of grid
         self.height = height    -- Height of grid
+        self.numPlayers = 2     -- Hard coded for now
+
+        self.bounds = self:getBounds()
+
 	    self.hexGrid = HXM.createRectGrid(width, height, 0)
+
+        -- Contains information about each player and the entities they control
+        self.playerEntities = {player_1={}, player_2={}, player_3={}, player_4={} }
 
         -- TODO: Fancy generation things
         -- START FANCY DEBUG TIME
@@ -95,7 +102,8 @@ World = Class{
         -- Leave if we find an empty tile
         --
         if obj == 0 then
-            return
+            obj = {color={0,0,0}, selected=false, draw=function(x,y) end}
+            --return
         end
 
         -- Draw the base hex grid
@@ -171,7 +179,17 @@ World = Class{
         cx = cx+1
         cy = cy+1
 
-        -- TODO: avoid out-of-bounds
+        -- avoid out-of-bounds
+        if self:outOfBounds(cx, cy) then
+            -- print("out of bounds")
+            return
+        end
+
+        -- handle empty sections of the grid
+        if self.hexGrid.grid[cy][cx] == nil then
+            -- print("no data here")
+            return
+        end
 
         -- Non-tiles should be skipped
         if self.hexGrid.grid[cy][cx] == 0 then
@@ -181,6 +199,41 @@ World = Class{
 
         -- TODO: instead of toggling, we should only have one selected tile at once
         self.hexGrid.grid[cy][cx].selected = (self.hexGrid.grid[cy][cx].selected == false)
+    end,
+
+
+    --
+    -- UPDATE function
+    --
+    -- Updates the entire world and everything in it. This is considered one "tick"
+    --
+    update = function(self, dt)
+        for playerId, entities in pairs(self.playerEntities) do
+            for idx, entity in pairs(entities) do
+                entity:update(dt)
+            end
+        end
+    end,
+
+
+    outOfBounds = function(self, cx, cy)
+        -- print("input:  ", cx, ", ", cy)
+        -- print("bounds: ", self.bounds.xmin, " -> ", self.bounds.xmax)
+        -- print("        ", self.bounds.ymin, " -> ", self.bounds.ymax)
+        return (cx < self.bounds.xmin) or
+               (cx > self.bounds.xmax) or
+               (cy < self.bounds.ymin) or
+               (cy > self.bounds.ymax)
+    end,
+
+
+    getBounds = function(self)
+        return {
+            xmin = -((math.ceil((self.width-1)+(self.height-1)/2))-self.width),
+            xmax = self.width,
+            ymin = 1,
+            ymax = self.height
+        }
     end
 }
 
