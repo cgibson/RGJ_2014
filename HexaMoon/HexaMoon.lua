@@ -87,7 +87,7 @@ function hxm.createRectGrid(width, height, obj)
 		for x=-(w-width), width do
 			if x > -math.floor(y/2) and
 			   x <= width - math.floor(y/2) then
-				grid[y][x] = obj
+				grid[y][x] = Tile()
 			else
 				grid[y][x] = nil
 			end

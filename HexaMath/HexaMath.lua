@@ -20,31 +20,39 @@ function hexamath.CalculatePath( world, vector1, vector2 )
     grid_cost = {}
     
     table.insert(frontier, vector1)
-    grid_memo[vector1] = vector1
-    grid_cost[vector1] = 0
+    grid_memo[vector1.x .. "," .. vector1.y] = vector1
+    grid_cost[vector1.x .. "," .. vector1.y] = 0
     frontier_i = table.remove(frontier, 1)
     while frontier_i ~= nil do
         for k,v in pairs(directions) do
-            print(v, frontier_i.x, frontier_i.y)
             x, y = HXM.getHexCoordinate(v, frontier_i.x, frontier_i.y)
             newVector = Vector(x, y)
-            if world:outOfBounds(newVector.x, newVector.y) == false and grid_memo[newVector] == nil then
-                print("New vector is good", newVector)
-                grid_memo[newVector] = frontier_i
+            newVectorId = x .. "," .. y
+            if world:outOfBounds(newVector.x, newVector.y) == false and grid_memo[newVectorId] == nil and world:getTile(newVector) ~= nil then
+                print("Adding to frontier", newVectorId, "->", frontier_i)
+                grid_memo[newVectorId] = frontier_i
                 newTile = world:getTile(newVector)
-                grid_cost[newVector] = grid_cost[frontier_i]
-                grid_cost[newVector] = grid_cost[newVector]-- + newTile:getWeight(1)
+                if newTile ~= nil then
+                    newTile.selected = true
+                end
+                grid_cost[newVectorId] = grid_cost[frontier_i.x .. "," .. frontier_i.y]
+                grid_cost[newVectorId] = grid_cost[newVectorId]-- + newTile:getWeight(1)
                 if newVector == vector2 then
                     print("OH DEAR GOD I FOUND IT")
+                    for k2,v2 in pairs(grid_memo) do
+                        print(k2, v2)
+                    end
                     returnPath = {}
                     while newVector ~= vector1 do
+                        print("Backtracking", newVector, "to", grid_memo[newVectorId])
                         table.insert(returnPath, 1, newVector)
-                        newVector = grid_memo[newVector]
+                        newVector = grid_memo[newVectorId]
+                        newVectorId = newVector.x .. "," .. newVector.y
                     end
                     return returnPath
                 end
                 i = 1
-                while frontier[i] ~= nil and grid_cost[frontier[i]] <= grid_cost[newVector] do
+                while frontier[i] ~= nil and grid_cost[frontier[i].x .. "," .. frontier[i].y] <= grid_cost[newVectorId] do
                     i = i + 1
                 end
                 table.insert(frontier, i, newVector)
