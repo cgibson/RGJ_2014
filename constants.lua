@@ -32,6 +32,7 @@ Constants = {
         TYPE_SPACE = 0,
         TYPE_PLANET = 1,
 		TYPE_ASTEROID = 2,
+        TYPE_OBSTACLE = 3,
         HEX_DRAW_BASE, HEX_DRAW_SELECTED, HEX_DRAW_CONTENTS = 1, 2, 3,
         TILE_RADIUS = 48
     },
@@ -44,8 +45,18 @@ Constants = {
 
     Entities = {
         RELAY_HP_MAX = 10,
-        RELAY_DISTANCE_MAX = 5
-    }
+        RELAY_DISTANCE_MAX = 5,
+
+        TYPE_SHEPHERD = 0,
+        TYPE_RELAY = 1
+    },
+
+    CRAZY_CHAN_MODE = false,
+
+    PLAYER_1 = 1,
+    PLAYER_2 = 2,
+
+    TICK_LENGTH = 1
 
 
 }

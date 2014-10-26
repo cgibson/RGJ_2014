@@ -9,6 +9,7 @@ hexamath = require "HexaMath.HexaMath"
 c = require "constants"
 
 Tile = require "entities.tile"
+Relay = require "entities.relay"
 Shepherd = require "entities.shepherd"
 
 
@@ -30,6 +31,8 @@ World = Class{
         self.height = height    -- Height of grid
         self.numPlayers = 2     -- Hard coded for now
 
+        self.time_since_last_tick = love.timer.getTime()
+
         self.bounds = self:getBounds()
 
 	    self.hexGrid = HXM.createRectGrid(width, height, 0)
@@ -40,13 +43,15 @@ World = Class{
 
             -- User
             player_1 = {
-                entities = {},
+                relays = {},
+                shepherd = nil,
                 selection = nil
             },
 
             -- Enemy (AI for now)
             player_2 = {
-                entities = {},
+                relays = {},
+                shepherd = nil,
                 selection = nil
             }
         }
@@ -67,7 +72,14 @@ World = Class{
         -- Hard coded shepherd path
         --shepherd:setNewPath( {Vector(1,2), Vector(1,3), Vector(1,4)} )
 
-        self.playerData.player_1.entities[#self.playerData.player_1.entities + 1] = self.shepherd
+        self.playerData.player_1.shepherd = self.shepherd
+
+        local relay1 = Relay( self, c.PLAYER_1, Vector(3, 1), "W")
+        self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay1
+
+        print("NUMBER OF RELAYS: ", #self.playerData.player_1.relays)
+
+
 
         -- END FANCY DEBUG TIME
     end,
@@ -108,8 +120,12 @@ World = Class{
         -- Draw entities
         for playerId, data in pairs(self.playerData) do
             -- Update entities
-            for idx, entity in pairs(data.entities) do
-                entity:draw()
+            for idx, relay in pairs(data.relays) do
+                relay:draw()
+            end
+
+            if data.shepherd ~= nil then
+                data.shepherd:draw()
             end
         end
     end,
@@ -288,10 +304,22 @@ World = Class{
     -- Updates the entire world and everything in it. This is considered one "tick"
     --
     update = function(self, dt)
+        t = love.timer.getTime()
+
         for playerId, data in pairs(self.playerData) do
-            -- Update entities
-            for idx, entity in pairs(data.entities) do
-                entity:update(dt)
+            -- update Shepherds
+            if data.shepherd ~= nil then
+                data.shepherd:update(dt)
+            end
+
+        end
+
+
+        if t - self.time_since_last_tick > c.TICK_LENGTH then
+            self.time_since_last_tick = t
+            for playerId, data in pairs(self.playerData) do
+                for key,value in pairs(data) do print(key,value) end
+                Relay.updateSheepingRoutes(data.relays)
             end
         end
     end,

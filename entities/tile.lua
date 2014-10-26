@@ -51,6 +51,48 @@ Tile = Class{
     end,
 
 
+    getRelay = function( self )
+        for i = 1, #self.entities do
+            -- There should only ever be one rely on a space
+            if self.entities[i].type == c.Entities.TYPE_RELAY then
+                return self.entities[i]
+            end
+        end
+    end,
+
+
+    getShepherds = function( self )
+        local shepherds = {}
+        for i = 1, #self.entities do
+            if self.entities[i].type == c.Entities.TYPE_SHEPHERD then
+                shepherds[#sheperds+1] = self.entities[i]
+            end
+        end
+
+        if #shepherds > 0 then
+            return shepherds
+        else
+            return nil
+        end
+    end,
+
+
+    getPlanet = function ( self )
+        if self.type == c.Tiles.TYPE_PLANET then
+            return self
+        end
+        return nil
+    end,
+
+
+    getObstacle = function (self)
+        if self.type == c.Tiles.TYPE_OBSTACLE then
+            return self
+        end
+        return nil
+    end,
+
+
     getBackground = function( self )
         if #self.entities > 0 then
             return {80, 150, 80 }
@@ -58,6 +100,16 @@ Tile = Class{
             return self.color
         end
 
+    end,
+
+
+    canReceiveSheep = function( self )
+
+        if self.type == c.Tiles.TYPE_PLANET then
+            return true
+        elseif self.type == c.Tiles.TYPE_OBSTACLE then
+            return false
+        end
     end,
 
 

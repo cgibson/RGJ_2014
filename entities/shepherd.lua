@@ -10,6 +10,7 @@ local STATE_IDLE, STATE_MOVING, STATE_BUILDING, STATE_RETREATING = 0, 1, 2, 3
 Shepherd = Class {
     init = function( self, world, pos )
         self.id =                       c.getNewId()
+        self.type =                     c.Entities.TYPE_SHEPHERD
         self.world =                    world       -- Copy of the world (for movement/placement)
         self.position =                 pos
         self.current_path =             {}
