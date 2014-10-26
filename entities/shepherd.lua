@@ -1,13 +1,14 @@
 
 
 HXM = require "HexaMoon.HexaMoon"
-Vector = require "hump.vector"
 
 local STATE_IDLE, STATE_MOVING, STATE_BUILDING, STATE_RETREATING = 0, 1, 2, 3
 
 
-Shepherd = Class{
-    init = function( self, pos )
+Shepherd = Class {
+    init = function( self, world, pos )
+        self.id =                       c.getNewId()
+        self.world =                    world       -- Copy of the world (for movement/placement)
         self.position =                 pos
         self.current_path =             {}
         self.speed =                    1           -- Speed (blocks/sec)
@@ -36,7 +37,7 @@ Shepherd = Class{
         if self.state == STATE_MOVING then
             if t - self.time_since_last_action > self.speed then
                 -- Pop the next point along the path from the FiFo and move the shepherd
-                self.position = table.remove(self.current_path, 1)
+                self:do_move(self.position, table.remove(self.current_path, 1))
 
                 -- Reset time last moved
                 self.time_since_last_action = t
@@ -60,8 +61,29 @@ Shepherd = Class{
     end,
 
 
+    --
+    -- Internal movement function
+    --
+    do_move = function( self, old_pos, new_pos )
+        self.position = new_pos
+
+        local tile = self.world:getTile(old_pos)
+        tile:removeEntity(self)
+
+        tile = self.world:getTile(new_pos)
+        tile:addEntity(self)
+    end,
+
+
+    move_action = function( self, move_to )
+
+
+    end,
+
+
     draw = function( self )
-        local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.position.x, self.position.y, 0, 0)
+        -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
+        local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.position.x-1, self.position.y-1, 0, 0)
         love.graphics.setColor(255,255,255)
         love.graphics.rectangle("fill",
                                 coord.x - (self.width / 2),
@@ -76,7 +98,8 @@ Shepherd = Class{
     drawPath = function( self )
         love.graphics.setColor(0, 255, 0)
         for i = 1, #self.current_path do
-            local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.current_path[i].x, self.current_path[i].y, 0, 0)
+            -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
+            local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.current_path[i].x-1, self.current_path[i].y-1, 0, 0)
             love.graphics.rectangle("fill",
                                     coord.x - 10,
                                     coord.y - 10,

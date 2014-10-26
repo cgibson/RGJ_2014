@@ -12,6 +12,9 @@ Tile = require "entities.tile"
 Shepherd = require "entities.shepherd"
 
 
+local empty_tile = Tile()
+empty_tile.color = {10,10,10}
+
 --
 -- WORLD class
 --
@@ -49,25 +52,30 @@ World = Class{
 
         -- TODO: Fancy generation things
         -- START FANCY DEBUG TIME
-        self:setTile( 1, 1, Tile() )
-        self:setTile( 2, 1, Tile() )
-        self:setTile( 3, 1, Tile() )
-        self:setTile( 4, 1, Tile() )
-        self:setTile( 1, 2, Tile() )
-        self:setTile( 1, 3, Tile() )
-        self:setTile( 1, 4, Tile() )
 
-        shepherd = Shepherd( Vector(1,1))
+        for i = 1, 5 do
+            for j = 1, 5 do
+                self:setTile( i, j, Tile() )
+            end
+        end
+
+        self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
+
+        shepherd = Shepherd( self, Vector(1,1))
         shepherd:setNewPath( {Vector(1,2), Vector(1,3), Vector(1,4)} )
 
         self.playerData.player_1.entities[#self.playerData.player_1.entities + 1] = shepherd
 
-        self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
         -- END FANCY DEBUG TIME
     end,
 
     setTile = function( self, cx, cy, obj )
         self.hexGrid.grid[cy][cx] = obj
+    end,
+
+
+    getTile = function( self, pos )
+        return self.hexGrid.grid[pos.y][pos.x]
     end,
 
 
@@ -119,7 +127,7 @@ World = Class{
         -- Leave if we find an empty tile
         --
         if obj == 0 then
-            obj = {color={0,0,0}, selected=false, draw=function(x,y) end}
+            obj = empty_tile
             --return
         end
 
@@ -128,7 +136,7 @@ World = Class{
         if args.mode == c.Tiles.HEX_DRAW_BASE then
             -- Draw the background
             local vertices = HXM.getHexVertices(c.Tiles.TILE_RADIUS, hexCoords.x, hexCoords.y)
-            love.graphics.setColor(obj.color)
+            love.graphics.setColor(obj:getBackground())
 
             love.graphics.polygon("fill",    vertices[1].x, vertices[1].y,
                                              vertices[2].x, vertices[2].y,
@@ -176,6 +184,20 @@ World = Class{
         elseif args.mode == c.Tiles.HEX_DRAW_CONTENTS then
             obj:draw(hexCoords.x, hexCoords.y)
         end
+    end,
+
+
+    --
+    -- Internal movement function
+    --
+    moveEntity = function( self, obj, old_pos, new_pos )
+        obj.position = new_pos
+
+        local tile = self:getTile(old_pos)
+        tile:removeEntity(self)
+
+        tile = self:getTile(new_pos)
+        tile:addEntity(self)
     end,
 
 

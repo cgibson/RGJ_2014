@@ -45,7 +45,35 @@ Tile = Class{
 		-- If no, weight to travel through is 3
         --
         -- Indexed by player id
-		self.explored = {false, false, false, false}
+		self.explored = {false, false, false, false }
+
+        self.entities = {}
+    end,
+
+
+    getBackground = function( self )
+        if #self.entities > 0 then
+            return {80, 150, 80 }
+        else
+            return self.color
+        end
+
+    end,
+
+
+    addEntity = function( self, obj )
+        if self.entities[obj.id] ~= nil then
+            print("Warning: entity ", obj.id, " already exists in tile.")
+        else
+            self.entities[obj.id] = obj
+        end
+    end,
+
+
+    removeEntity = function( self, obj )
+        if self.entities[obj.id] ~= nil then
+            self.entities[obj.id] = nil
+        end
     end,
 }
 

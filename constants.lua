@@ -2,6 +2,8 @@
 --
 --
 
+CURRENT_ENTITY_ID = 1
+
 Constants = {
     --
     -- Basic shortcuts
@@ -42,6 +44,12 @@ Constants = {
 
 
 }
+
+function Constants.getNewId()
+    id = CURRENT_ENTITY_ID
+    CURRENT_ENTITY_ID = CURRENT_ENTITY_ID + 1
+    return id
+end
 
 --
 -- Command inputs (TODO)
