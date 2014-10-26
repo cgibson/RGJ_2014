@@ -17,6 +17,11 @@ function Game:enter()
     self.mouse_drag = false
     self.mouse_last_pos = nil
 
+    -- Action/meta variables
+    self.meta_key = false
+
+
+    -- Action status
     self.camera_moving = false
 end
 
@@ -36,9 +41,16 @@ end
 -- PRESSED functions
 --
 function Game:keypressed( key, isrepeat )
+    if key == "lgui" then
+        print("enabling meta key")
+        self.meta_key = true
+    end
 end
 
 function Game:keyreleased( key, isrepeat )
+    if key == "lgui" then
+        self.meta_key = false
+    end
 end
 
 
@@ -49,10 +61,12 @@ function Game:mousepressed( x, y, mouse )
     self.mouse_drag = true
 
     if mouse == c.MOUSE_BUTTON_LEFT then
+        if self.meta_key then
+            self.camera_moving = true
+            self.mouse_last_pos = {x, y}
+        end
 
     elseif mouse == c.MOUSE_BUTTON_RIGHT then
-        self.camera_moving = true
-        self.mouse_last_pos = {x, y}
     end
 end
 
@@ -60,11 +74,12 @@ function Game:mousereleased( x, y, mouse )
     self.mouse_drag = false
 
     if mouse == c.MOUSE_BUTTON_LEFT then
+        self.camera_moving = false
+
         -- Convert screen coordinates to world coordinates
         wx, wy = self.camera:worldCoords(x, y)
         self.world:selectTile(wx, wy)
     elseif mouse == c.MOUSE_BUTTON_RIGHT then
-        self.camera_moving = false
     end
 end
 
