@@ -19,6 +19,10 @@ Constants = {
     --
     Colors = {
         HEX_BLACK           = {30, 30, 30 },
+        HEX_BLUE            = {0, 0, 60},
+        HEX_WHITE           = {200, 200, 200},
+        HEX_YELLOW          = {200, 200, 0},
+        HEX_GREY            = {150, 150, 150},
         HEX_BORDER          = {60, 60, 110 },
         HEX_BORDER_SELECTED = {100, 100, 150 }
     },
@@ -58,9 +62,9 @@ Constants = {
     PLAYER_1 = 1,
     PLAYER_2 = 2,
 
-    TICK_LENGTH = 1
+    TICK_LENGTH = 1,
 
-
+    DIRECTIONS = {"NE", "E", "SE", "SW", "W", "NW"}
 }
 
 function Constants.getNewId()

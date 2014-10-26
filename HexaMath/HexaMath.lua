@@ -1,8 +1,8 @@
 local hexamath = {}
 HXM = require "HexaMoon.HexaMoon"
+c = require "constants"
 local grid_memo = {}
 local grid_cost = {}
-local directions = {"NE", "E", "SE", "SW", "W", "NW"}
 
 function hexamath.createMemo (width, height)
     grid_memo = HXM.createRectGrid(width, height, 0)
@@ -33,12 +33,12 @@ function hexamath.CalculatePath( world, vector1, vector2 )
     grid_cost[vector1.x .. "," .. vector1.y] = 0
     frontier_i = table.remove(frontier, 1)
     while frontier_i ~= nil do
-        for k,v in pairs(directions) do
+        for k,v in pairs(c.DIRECTIONS) do
             x, y = HXM.getHexCoordinate(v, frontier_i.x, frontier_i.y)
             newVector = Vector(x, y)
             newVectorId = x .. "," .. y
             if world:outOfBounds(newVector.x, newVector.y) == false and grid_memo[newVectorId] == nil and world:getTile(newVector) ~= nil then
-                print("Adding to frontier", newVectorId, "->", frontier_i)
+                --print("Adding to frontier", newVectorId, "->", frontier_i)
                 grid_memo[newVectorId] = frontier_i
                 newTile = world:getTile(newVector)
                 if newTile ~= nil then
@@ -53,7 +53,7 @@ function hexamath.CalculatePath( world, vector1, vector2 )
                     --end
                     returnPath = {}
                     while newVector ~= vector1 do
-                        print("Backtracking", newVector, "to", grid_memo[newVectorId])
+                        --print("Backtracking", newVector, "to", grid_memo[newVectorId])
                         table.insert(returnPath, 1, newVector)
                         newVector = grid_memo[newVectorId]
                         newVectorId = newVector.x .. "," .. newVector.y

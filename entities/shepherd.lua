@@ -11,6 +11,7 @@ Shepherd = Class {
     init = function( self, world, pos )
         self.id =                       c.getNewId()
         self.type =                     c.Entities.TYPE_SHEPHERD
+        self.hp =                       20
         self.world =                    world       -- Copy of the world (for movement/placement)
         self.position =                 pos
         self.current_path =             {}
@@ -25,6 +26,7 @@ Shepherd = Class {
 
         self.state =                    STATE_IDLE  -- idle, building, moving, retreating
         self.selected =                 false
+        self:scanTiles( self.hp, self.position )
     end,
 
 
@@ -94,9 +96,31 @@ Shepherd = Class {
 
         tile = self.world:getTile(new_pos)
         tile:addEntity(self)
+        
+        self:scanTiles(self.hp, new_pos)
     end,
 
-
+    scanTiles = function( self, hp, pos )
+        scanTile = self.world:getTile(pos)
+        if scanTile ~= nil then
+            scanTile:explore(c.PLAYER_1)
+        end
+        for k,v in pairs(c.DIRECTIONS) do
+            sensor_x = pos.x
+            sensor_y = pos.y
+            for i=1, hp/10 do
+                x, y = HXM.getHexCoordinate(v, sensor_x, sensor_y)
+                newVector = Vector(x, y)
+                scanTile = self.world:getTile(newVector)
+                if scanTile ~= nil then
+                    scanTile:explore(c.PLAYER_1)
+                end
+                sensor_x = x
+                sensor_y = y
+            end
+        end
+    end,
+    
     move_action = function( self, move_to )
         if self.position ~= move_to then
             self.state = STATE_MOVING

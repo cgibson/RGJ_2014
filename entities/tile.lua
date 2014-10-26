@@ -46,10 +46,28 @@ Tile = Class{
         --
         -- Indexed by player id
 		self.explored = {false, false, false, false }
+        
+        -- Indexed by player id
+        self.owner = 0
 
         self.entities = {}
     end,
 
+    update = function( self )
+        if self.owner == 1 then self.color = c.Colors.HEX_BLUE
+        elseif self.explored[1] == false then self.color = c.Colors.HEX_BLACK
+        elseif self.explored[1] == true then
+            if self.type == c.Tiles.TYPE_ASTEROID then self.color = c.Colors.HEX_WHITE
+            elseif self.owner ~= 0 then self.color = c.Colors.HEX_YELLOW
+            else self.color = c.Colors.HEX_GREY
+            end
+        end
+    end,
+    
+    explore = function( self, playerId )
+        self.explored[playerId] = true
+        self:update()
+    end,
 
     getRelay = function( self )
 
