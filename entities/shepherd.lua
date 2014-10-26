@@ -7,32 +7,36 @@ Vector = require "hump.vector"
 Shepherd = Class{
     init = function( self, pos )
         self.position =                 pos
-        self.current_path =             {Vector(1,2), Vector(1,3), Vector(1,4)}
+        self.current_path =             {}
         self.speed =                    1       -- Speed (blocks/sec)
         self.time_since_last_move =     0       -- Time since last movement
                                                 -- TODO: we should replace this with a tween sooner or later
-        self.moving =                   false   -- Whether or not the Shepherd is moving to a new block
         self.width =                    32      -- Size of the shepherd
         self.height =                   32      -- Ditto on the size thing
     end,
 
 
-    setNewPath = function( self )
+    setNewPath = function( self, path )
         self.time_since_last_move = love.timer.getTime()
+        self.current_path = path
     end,
 
 
     update = function( self, dt )
         t = love.timer.getTime()
-
         -- TODO: Probably set up speed to be reverse-proportional to the time it takes to move
-        if love.timer.getTime() - t > self.speed then
+        if #self.current_path > 0 then
+            if t - self.time_since_last_move > self.speed then
+                -- Pop the next point along the path from the FiFo and move the shepherd
+                self.position = table.remove(self.current_path, 1)
 
-            -- Pop the next point along the path from the FiFo and move the shepherd
-            self.position = table.remove(self.current_path, 1)
+                -- Reset time last moved
+                self.time_since_last_move = t
 
-            -- Reset time last moved
-            self.time_since_last_move = t
+                if #self.current_path < 1 then
+                    print("shepherd stopping")
+                end
+            end
         end
     end,
 

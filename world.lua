@@ -57,7 +57,10 @@ World = Class{
         self:setTile( 1, 3, Tile() )
         self:setTile( 1, 4, Tile() )
 
-        self.playerData.player_1.entities[#self.playerData.player_1.entities + 1] = Shepherd( Vector(1,1) )
+        shepherd = Shepherd( Vector(1,1))
+        shepherd:setNewPath( {Vector(1,2), Vector(1,3), Vector(1,4)} )
+
+        self.playerData.player_1.entities[#self.playerData.player_1.entities + 1] = shepherd
 
         self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
         -- END FANCY DEBUG TIME
