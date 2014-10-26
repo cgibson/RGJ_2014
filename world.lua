@@ -78,6 +78,8 @@ World = Class{
 
 
     getTile = function( self, pos )
+        print (pos, pos.x, pos.y)
+        print (self.hexGrid.grid)
         return self.hexGrid.grid[pos.y][pos.x]
     end,
 
