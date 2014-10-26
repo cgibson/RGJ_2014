@@ -3,39 +3,58 @@
 HXM = require "HexaMoon.HexaMoon"
 Vector = require "hump.vector"
 
+local STATE_IDLE, STATE_MOVING, STATE_BUILDING, STATE_RETREATING = 0, 1, 2, 3
+
 
 Shepherd = Class{
     init = function( self, pos )
         self.position =                 pos
         self.current_path =             {}
-        self.speed =                    1       -- Speed (blocks/sec)
-        self.time_since_last_move =     0       -- Time since last movement
-                                                -- TODO: we should replace this with a tween sooner or later
-        self.width =                    32      -- Size of the shepherd
-        self.height =                   32      -- Ditto on the size thing
+        self.speed =                    1           -- Speed (blocks/sec)
+        self.time_since_last_action =   0           -- Time since last movement
+                                                    -- TODO: we should replace this with a tween sooner or later
+        self.width =                    32          -- Size of the shepherd
+        self.height =                   32          -- Ditto on the size thing
+
+        self.to_build =                 nil         -- If this is not-nil, the shepherd will place the entity
+                                                    -- once it arrives at its destination
+
+        self.state =                    STATE_IDLE  -- idle, building, moving, retreating
     end,
 
 
     setNewPath = function( self, path )
         self.time_since_last_move = love.timer.getTime()
         self.current_path = path
+        self.state = STATE_MOVING
     end,
 
 
     update = function( self, dt )
         t = love.timer.getTime()
         -- TODO: Probably set up speed to be reverse-proportional to the time it takes to move
-        if #self.current_path > 0 then
-            if t - self.time_since_last_move > self.speed then
+        if self.state == STATE_MOVING then
+            if t - self.time_since_last_action > self.speed then
                 -- Pop the next point along the path from the FiFo and move the shepherd
                 self.position = table.remove(self.current_path, 1)
 
                 -- Reset time last moved
-                self.time_since_last_move = t
+                self.time_since_last_action = t
 
                 if #self.current_path < 1 then
-                    print("shepherd stopping")
+                    if self.to_build ~= nil then
+                        self.time_since_last_action = love.timer.getTime()
+                        -- Update state to BUILDING
+                        self.state = STATE_BUILDING
+                    else
+                        self.state = STATE_IDLE
+                    end
                 end
+            end
+        elseif self.state == STATE_BUILDING then
+            -- We are going to build something... figure out how much time it will take
+            if t - self.time_since_last_action > self.to_build.build_time then
+                self.state = STATE_IDLE
             end
         end
     end,
