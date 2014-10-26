@@ -80,8 +80,6 @@ World = Class{
         local relay2 = Relay( self, c.PLAYER_1, Vector(5, 2), "W")
         self.playerData.player_1.relays[#self.playerData.player_1.relays+1] = relay2
 
-        print("NUMBER OF RELAYS: ", #self.playerData.player_1.relays)
-
 
 
         -- END FANCY DEBUG TIME
@@ -93,8 +91,6 @@ World = Class{
 
 
     getTile = function( self, pos )
-        print (pos, pos.x, pos.y)
-        print (self.hexGrid.grid)
         return self.hexGrid.grid[pos.y][pos.x]
     end,
 
@@ -153,10 +149,6 @@ World = Class{
             obj = empty_tile
             --return
         end
-
-        print("------")
-        for k,v in pairs(obj) do print(k,v) end
-        print("-----")
 
         -- Draw the base hex grid
         --
@@ -313,7 +305,6 @@ World = Class{
     -- Updates the entire world and everything in it. This is considered one "tick"
     --
     update = function(self, dt)
-        print("", Vector(55,55))
         t = love.timer.getTime()
 
         for playerId, data in pairs(self.playerData) do
@@ -328,7 +319,6 @@ World = Class{
         if t - self.time_since_last_tick > c.TICK_LENGTH then
             self.time_since_last_tick = t
             for playerId, data in pairs(self.playerData) do
-                for key,value in pairs(data) do print(key,value) end
                 Relay.updateSheepingRoutes(data.relays)
             end
         end
