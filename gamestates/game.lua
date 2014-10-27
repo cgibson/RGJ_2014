@@ -160,7 +160,9 @@ function Game:update(dt)
     if self.relay_placing and self.relay_placing_obj then
         --TODO: update direction of relay
         placing_delta = Vector(mx - self.relay_placing_pos.x, my - self.relay_placing_pos.y)
-        print("delta from first click:", placing_delta)
+
+        self.relay_placing_obj:updateDirectionAngle(math.atan2(placing_delta.x, -placing_delta.y))
+
     -- Otherwise, move the camera
     elseif self.camera_moving then
 

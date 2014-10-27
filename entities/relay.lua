@@ -5,6 +5,17 @@ local HXM = require "HexaMoon.HexaMoon"
 
 local STATE_IDLE, STATE_BUILDING, STATE_SHOOTING, STATE_PLACING = 1, 2, 3, 4
 
+local PI = 3.14159
+local TPI = PI / 3
+local dir_angle = {
+    NE = 5 * TPI,
+    E  = 0 * TPI,
+    SE = 1 * TPI,
+    SW = 2 * TPI,
+    W  = 3 * TPI,
+    NW = 4 * TPI,
+}
+
 Relay = Class {
     init = function( self, world, owner, pos, direction )
         self.type =                     c.Entities.TYPE_RELAY
@@ -94,6 +105,10 @@ Relay = Class {
             prev = {}
         end
 
+        if self.state == STATE_BUILDING then
+            return true
+        end
+
         -- Check to ensure we aren't in an infinite loop.
         -- If CRAZY CHAN is enabled, then... meh... let's do it
         for relayId, relay in pairs(prev) do
@@ -109,10 +124,31 @@ Relay = Class {
         end
 
         if self.target.type == c.Entities.TYPE_RELAY then
+
+            if self.target.state == STATE_BUILDING then
+                return true
+            end
+
             return self.target:canReceiveSheep(prev)
         end
 
         return true
+
+    end,
+
+
+    updateDirectionAngle = function( self, angle )
+        angle = angle + PI
+
+        if angle < (1 * TPI) then     dir = "SW"
+        elseif angle < (2 * TPI) then dir = "W"
+        elseif angle < (3 * TPI) then dir = "NW"
+        elseif angle < (4 * TPI) then dir = "NE"
+        elseif angle < (5 * TPI) then dir = "E"
+        else                          dir = "SE"
+        end
+
+        self.direction = dir
 
     end,
 
@@ -194,10 +230,10 @@ Relay = Class {
         else
             love.graphics.setColor(100,40,100)
         end
-        vertexes = self:getDirectionVertexes(self.direction)
-        love.graphics.polygon("fill", coord.x + vertexes[1], coord.y + vertexes[2], 
-                                      coord.x + vertexes[3], coord.y + vertexes[4], 
-                                      coord.x + vertexes[5], coord.y + vertexes[6])
+        local vertexes = self:getDirectionVertexes(self.direction)
+        love.graphics.polygon("fill", coord.x + vertexes[1].x, coord.y + vertexes[1].y,
+                                      coord.x + vertexes[2].x, coord.y + vertexes[2].y,
+                                      coord.x + vertexes[3].x, coord.y + vertexes[3].y)
         --love.graphics.rectangle("fill",
         --                        coord.x - 16,
         --                        coord.y - 16,
@@ -211,6 +247,7 @@ Relay = Class {
     end,
     
     getDirectionVertexes = function(self, vertex)
+        --[[
         if vertex == "NE" then return {-18,0 , 15,15 , 15,-15}
         elseif vertex == "E" then return {18,0 , -15,-15 , 15,15}
         elseif vertex == "SE" then return {-18,0 , 15,15 , 15,-15}
@@ -218,6 +255,12 @@ Relay = Class {
         elseif vertex == "W" then return {-18,0 , 15,15 , 15,-15}
         elseif vertex == "NW" then return {18,0 , -15,-15 , 15,15}
         end
+        ]]--
+
+
+        local angle = dir_angle[self.direction]
+        return {Vector(18,0):rotated(angle) , Vector(-15,15):rotated(angle) , Vector(-15,-15):rotated(angle) }
+
     end
     
     
