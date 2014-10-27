@@ -86,6 +86,7 @@ Relay = Class {
         end
 
 
+        print (self.target, self.target:canReceiveSheep())
         if self.target:canReceiveSheep() == false then
             -- print("target " .. self.target.id .. " can't receive sheep")
             return

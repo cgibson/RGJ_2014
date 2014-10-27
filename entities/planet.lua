@@ -18,6 +18,13 @@ Planet = Class {
         if self.owner ~= nil then
             self.sheep = self.sheep + c.SHEEP_GEN_RATE
         end
+        
+        local tiles = self.world:getNeighboringTiles(self.position)
+        for idx, tile_inner in pairs(tiles) do
+            if tile_inner:getRelay() ~= nil and tile_inner:getRelay():canReceiveSheep() then
+                tile_inner:getRelay():receiveSheep(1, self.owner)
+            end                
+        end
 
     end,
 
@@ -26,7 +33,6 @@ Planet = Class {
         -- TODO: handle teams
         self.sheep = self.sheep + count
     end,
-
 
     draw = function( self )
 

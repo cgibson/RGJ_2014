@@ -86,6 +86,7 @@ Tile = Class{
                 return obj
             end
         end
+        return nil
     end,
 
 
@@ -141,7 +142,7 @@ Tile = Class{
 
         if self.type == c.Tiles.TYPE_PLANET or self.type == c.Tiles.TYPE_PLANET_OUTER then
             return true
-        elseif self.type == c.Tiles.TYPE_OBSTACLE then
+        else --if self.type == c.Tiles.TYPE_OBSTACLE then
             return false
         end
     end,
