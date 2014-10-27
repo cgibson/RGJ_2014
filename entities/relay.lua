@@ -199,11 +199,9 @@ Relay = Class {
                 obj = tile:getPlanet()
                 -- Not PLANET OUTER
                 if obj ~= nil then
-                    if obj.type == c.Tiles.TYPE_PLANET then
-                        -- print("Relay " .. self.id .. " targeting planet on " .. coord.x .. "," .. coord.y)
-                        self.target = obj
-                        return
-                    end
+                    -- print("Relay " .. self.id .. " targeting planet on " .. coord.x .. "," .. coord.y)
+                    self.target = obj
+                    return
                 end
             end
         end

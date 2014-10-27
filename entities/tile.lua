@@ -112,7 +112,6 @@ Tile = Class{
                 return obj
             end
         end
-
         return nil
     end,
 
