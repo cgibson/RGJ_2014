@@ -34,7 +34,7 @@ Planet = Class {
         local coord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, self.position.x-1, self.position.y-1, 0, 0)
 
         love.graphics.setColor(240, 240, 20)
-        love.graphics.circle("fill", coord.x, coord.y, 32)
+        love.graphics.circle("fill", coord.x, coord.y, 72)
         love.graphics.setColor(0,255,0)
         love.graphics.print("Sheep: " .. self.sheep, coord.x, coord.y)
     end

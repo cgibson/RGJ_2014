@@ -138,18 +138,42 @@ World = Class{
 
 
     createPlanet = function( self, pos )
-        tile = self:getTile(pos)
+        local tile = self:getTile(pos)
 
         if tile == nil then
             print ("ERROR: Could not create planet at ", pos)
             return
         end
-        -- TODO: Change neighbors to planet as well AND GIVE IT THE SAME PLANET ITEM
 
-        planet = Planet(self, pos)
-        tile.type = c.Tiles.TYPE_PLANET
-        tile:addEntity(planet)
+        -- Add to list of planets
+        local planet = Planet(self, pos)
         self.planets[#self.planets+1] = planet
+
+
+        -- Find all neighbors and add the planet to them as well
+        local tiles = self:getNeighboringTiles(pos)
+        tiles[#tiles+1] = tile
+
+        for idx, tile_inner in pairs(tiles) do
+            tile_inner.type = c.Tiles.TYPE_PLANET
+            tile_inner:addEntity(planet)
+        end
+    end,
+
+
+
+    getNeighboringTiles = function( self, pos )
+
+        local neighbors = {}
+        for dir, offset in pairs(HXM.neighbors) do
+            local tile = self:getTile( Vector(offset[1] + pos.x, offset[2] + pos.y) )
+
+            if tile ~= nil then
+                neighbors[#neighbors+1] = tile
+            end
+        end
+
+        return neighbors
     end,
 
 

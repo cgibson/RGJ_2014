@@ -125,6 +125,9 @@ Tile = Class{
 
 
     getBackground = function( self )
+        if self.type == c.Tiles.TYPE_PLANET then
+            return {0, 255, 255}
+        end
         if #self.entities > 0 then
             return {20, 70, 20 }
         else
