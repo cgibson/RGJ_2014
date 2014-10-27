@@ -72,7 +72,8 @@ World = Class{
             end
         end
 
-        self:createPlanet( Vector(4,4) )
+        self:createPlanet( Vector(4,4), nil )
+        self:createPlanet( Vector(0,5), c.PLAYER_1)
         
         for i = 3, 8 do
             self.hexGrid.grid[i][i] = nil
@@ -137,7 +138,7 @@ World = Class{
     end,
 
 
-    createPlanet = function( self, pos )
+    createPlanet = function( self, pos, player )
         local tile = self:getTile(pos)
 
         if tile == nil then
@@ -146,7 +147,7 @@ World = Class{
         end
 
         -- Add to list of planets
-        local planet = Planet(self, pos)
+        local planet = Planet(self, pos, player)
         self.planets[#self.planets+1] = planet
 
 

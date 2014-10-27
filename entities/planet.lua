@@ -4,11 +4,11 @@ local Class = require "hump.class"
 
 
 Planet = Class {
-    init = function( self, world, pos )
+    init = function( self, world, pos, player )
         self.id =                       c.getNewId()
         self.world = world
         self.position = pos
-        self.owner = nil
+        self.owner = player
         self.sheep = 0
 
     end,
