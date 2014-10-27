@@ -29,6 +29,11 @@ Planet = Class {
     end,
 
 
+    canReceiveSheep = function( self )
+        return true
+    end,
+
+
     receiveSheep = function( self, count, owner)
         -- TODO: handle teams
         self.sheep = self.sheep + count
