@@ -139,8 +139,20 @@ Relay = Class {
 
 
     receiveSheep = function( self, count, owner)
-        -- TODO: handle teams
-        self.buffer = self.buffer + count
+        if self.owner ~= owner then
+            if self.buffer > 0 then
+                self.buffer = self.buffer - math.min(self.buffer, count)
+                count = count - math.min(self.buffer, count)
+                if self.buffer == 0 then
+                    self.hp = self.hp - math.min(self.hp, count)
+                    if self.hp == 0 then
+                        self.owner = owner
+                    end
+                end
+            end
+        else
+            self.buffer = self.buffer + count
+        end
     end,
 
 
