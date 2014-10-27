@@ -155,7 +155,13 @@ World = Class{
         tiles[#tiles+1] = tile
 
         for idx, tile_inner in pairs(tiles) do
-            tile_inner.type = c.Tiles.TYPE_PLANET
+
+            -- Make outer planets just that... PLANET_OUTER
+            if tile_inner.position ~= pos then
+                tile_inner.type = c.Tiles.TYPE_PLANET_OUTER
+            else
+                tile_inner.type = c.Tiles.TYPE_PLANET
+            end
             tile_inner:addEntity(planet)
         end
     end,

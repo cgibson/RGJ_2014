@@ -37,6 +37,7 @@ Constants = {
         TYPE_PLANET = 1,
 		TYPE_ASTEROID = 2,
         TYPE_OBSTACLE = 3,
+        TYPE_PLANET_OUTER = 4,
         HEX_DRAW_BASE, HEX_DRAW_SELECTED, HEX_DRAW_CONTENTS = 1, 2, 3,
         TILE_RADIUS = 48
     },

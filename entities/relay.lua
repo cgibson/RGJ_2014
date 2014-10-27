@@ -66,28 +66,28 @@ Relay = Class {
 
     sendSheep = function( self )
 
-        print("Relay " .. self.id .. " attempting to send sheep")
+        -- print("Relay " .. self.id .. " attempting to send sheep")
         -- Skip the rest if the relay is not enabled
         if enabled == false then
-            print(" disabled... ")
+            -- print(" disabled... ")
             return
         end
 
         -- Bail out if you have no target
         if self.target == nil then
-            print(" No target... ")
+            -- print(" No target... ")
             return
         end
 
         -- If we don't have anything in our buffer
         if self.out_buffer < 1 then
-            print("Nothing in our buffer")
+            -- print("Nothing in our buffer")
             return
         end
 
 
         if self.target:canReceiveSheep() == false then
-            print("target " .. self.target.id .. " can't receive sheep")
+            -- print("target " .. self.target.id .. " can't receive sheep")
             return
         end
 
@@ -168,14 +168,14 @@ Relay = Class {
         elseif state == STATE_SHOOTING then state_str = "SHOOTING"
         end
 
-        print("Relay (" .. self.id .. ") changed state to " .. state_str)
+        -- print("Relay (" .. self.id .. ") changed state to " .. state_str)
 
         self.state = state
     end,
 
 
     updateTarget = function( self )
-        print("UPDATING TARGET for relay " .. self.id)
+        -- print("UPDATING TARGET for relay " .. self.id)
         local coord = self.position
         local tile, obj
         for dist = 1, c.Entities.RELAY_DISTANCE_MAX do
@@ -189,7 +189,7 @@ Relay = Class {
                 -- We don't even care who's relay this is. If it exists, we point and shoot
                 obj = tile:getRelay()
                 if obj ~= nil then
-                    print("Relay " .. self.id .. " targeting other relay " .. obj.id .. " on " .. coord.x .. "," .. coord.y)
+                    -- print("Relay " .. self.id .. " targeting other relay " .. obj.id .. " on " .. coord.x .. "," .. coord.y)
                     self.target = obj
                     return
                 end
@@ -197,14 +197,14 @@ Relay = Class {
                 -- If it's a planet, then duh we send stuff there
                 obj = tile:getPlanet()
                 if obj ~= nil then
-                    print("Relay " .. self.id .. " targeting planet on " .. coord.x .. "," .. coord.y)
+                    -- print("Relay " .. self.id .. " targeting planet on " .. coord.x .. "," .. coord.y)
                     self.target = obj
                     return
                 end
             end
         end
 
-        print("Relay " .. self.id .. " has no current target.")
+        -- print("Relay " .. self.id .. " has no current target.")
     end,
 
 
@@ -295,7 +295,10 @@ function Relay.startPlacingRelay(world, playerId, pos, direction)
 
     -- Cannot place on planets
     if tile:getPlanet() ~= nil then
-        return {error="Cannot place a rely on a planet"}
+        -- We can place on PLANET_OUTER tiles, just not PLANET tiles
+        if tile.type == c.Tiles.TYPE_PLANET then
+            return {error="Cannot place a rely on a planet" }
+        end
     end
 
     -- Must place on a tile that can receive sheep
@@ -322,7 +325,7 @@ end
 
 
 function Relay.buildPendingRelay( world, playerId, freeSheep )
-    print("Building relay for player " .. playerId)
+    -- print("Building relay for player " .. playerId)
 
     -- Grab the relay from player data
     local relay = world.player_data[playerId].relay_to_build
