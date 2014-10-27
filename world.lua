@@ -35,8 +35,8 @@ World = Class{
 
         self.bounds = self:getBounds()
 
-	    self.hexGrid = HXM.createRectGrid(width, height, nil)
-        hexamath.createMemo( width, height )
+        self.planets = {}
+	    self.hexGrid = HXM.createRectGrid(width, height, nil, self.planets)
 
         -- Contains information about each player and the entities they control
         self.player_data = {}
@@ -365,7 +365,11 @@ World = Class{
 
         end
 
-
+        for _,planets in pairs(self.planets) do
+            -- update Planets
+            planets:update()
+        end
+        
         if t - self.time_since_last_tick > c.TICK_LENGTH then
             self.time_since_last_tick = t
             for playerId, data in pairs(self.player_data) do

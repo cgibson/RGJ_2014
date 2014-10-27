@@ -78,7 +78,7 @@ function hxm.getNearestHex(x, y)
 end
 
 -- Creates rectangular shaped grid with origin at top left corner
-function hxm.createRectGrid(width, height, obj)
+function hxm.createRectGrid(width, height, obj, planets)
 	-- obj = obj or {__val=true}
 	local grid = {}
 	local w = math.ceil((width-1) + (height-1)/2)
@@ -88,6 +88,9 @@ function hxm.createRectGrid(width, height, obj)
 			if x > -math.floor(y/2) and
 			   x <= width - math.floor(y/2) then
 				grid[y][x] = Tile()
+                if grid[y][x]:getPlanet() ~= nil then
+                    table.insert(planets, grid[y][x])
+                end
 			else
 				grid[y][x] = nil
 			end
