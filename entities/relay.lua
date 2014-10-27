@@ -25,7 +25,7 @@ Relay = Class {
         self.direction =                direction
         self.hp =                       c.Entities.RELAY_HP_MAX
         self.buffer =                   0           -- The amount of sheep the relay needs to expel
-        self.out_buffer =                0           -- Sheeping and sending
+        self.out_buffer =               0           -- Sheeping and sending
         self.state =                    STATE_IDLE
         self.owner =                    owner
         self.enabled =                  true
@@ -69,26 +69,26 @@ Relay = Class {
         -- print("Relay " .. self.id .. " attempting to send sheep")
         -- Skip the rest if the relay is not enabled
         if enabled == false then
-            -- print(" disabled... ")
+            --print(" disabled... ")
             return
         end
 
         -- Bail out if you have no target
         if self.target == nil then
-            -- print(" No target... ")
+            --print(" No target... ")
             return
         end
 
         -- If we don't have anything in our buffer
         if self.out_buffer < 1 then
-            -- print("Nothing in our buffer")
+            --print("Nothing in our buffer")
             return
         end
 
 
         print (self.target, self.target:canReceiveSheep())
         if self.target:canReceiveSheep() == false then
-            -- print("target " .. self.target.id .. " can't receive sheep")
+             print("target " .. self.target.id .. " can't receive sheep")
             return
         end
 
@@ -96,7 +96,7 @@ Relay = Class {
         -- TODO: this
 
         -- Send your buffer to your target
-        self.target:receiveSheep(self.out_buffer)
+        self.target:receiveSheep(self.out_buffer, self.owner)
         self.out_buffer = 0
     end,
 

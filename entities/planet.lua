@@ -36,7 +36,12 @@ Planet = Class {
 
     receiveSheep = function( self, count, owner)
         -- TODO: handle teams
-        self.sheep = self.sheep + count
+        print("Planet receiving", count, "from", owner)
+        if self.owner ~= owner then
+            if self.sheep - count < 0 then self.owner = owner end
+        else
+            self.sheep = self.sheep + count
+        end
     end,
 
     draw = function( self )

@@ -74,10 +74,6 @@ World = Class{
 
         self:createPlanet( Vector(4,4), nil )
         self:createPlanet( Vector(0,5), c.PLAYER_1)
-        
-        for i = 3, 8 do
-            self.hexGrid.grid[i][i] = nil
-        end
 
         self.shepherd = Shepherd( self, Vector(1,1))
 
