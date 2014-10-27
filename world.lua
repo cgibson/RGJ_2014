@@ -212,7 +212,7 @@ World = Class{
         for playerId, data in pairs(self.player_data) do
             -- Update entities
             for idx, relay in pairs(data.relays) do
-                relay:drawPath()
+                --relay:drawPath()
             end
         end
 
@@ -416,9 +416,15 @@ World = Class{
         t = love.timer.getTime()
 
         for playerId, data in pairs(self.player_data) do
-            -- update Shepherds
+            -- update Shepherds and relays pointing to them
             if data.shepherd ~= nil then
                 data.shepherd:update(dt)
+                for relayId, relay in pairs(data.relays) do
+                    local dist = hexamath.VectorDistance( data.shepherd.position, relay.position )
+                    if dist <= c.Entities.RELAY_DISTANCE_MAX then
+                        relay:updateTarget()
+                    end
+                end
             end
 
         end

@@ -199,6 +199,12 @@ Relay = Class {
             coord = Vector(x, y)
 
             if tile ~= nil then
+                obj = tile:getShepherds()
+                if obj ~= nil then
+                    self.target = obj[1]
+                    return
+                end
+                    
                 -- We don't even care who's relay this is. If it exists, we point and shoot
                 obj = tile:getRelay()
                 if obj ~= nil then
@@ -224,10 +230,10 @@ Relay = Class {
 
     -- For each player, search through their receivers. If the receiver is WITHIN
     -- RELAY_DISTANCE_MAX, then it's worth updating its target
-    notifyNearbyRelays = function( self )
+    notifyNearbyRelays = function( self, position )
         for playerId, data in pairs(self.world.player_data) do
             for relayId, relay in pairs(data.relays) do
-                local dist = hexamath.VectorDistance( self.position, relay.position )
+                local dist = hexamath.VectorDistance( position, relay.position )
                 if dist <= c.Entities.RELAY_DISTANCE_MAX then
                     relay:updateTarget()
                 end
@@ -245,7 +251,8 @@ Relay = Class {
         local spos = self.position
         local epos = self.target.position
 
-
+        print(epos.x, epos.y)
+        
         -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
         local scoord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, spos.x-1, spos.y-1, 0, 0)
         local ecoord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, epos.x-1, epos.y-1, 0, 0)
@@ -264,7 +271,7 @@ Relay = Class {
         end
 
         love.graphics.line(scoord.x, scoord.y, ecoord.x, ecoord.y)
-
+        
 
 
 
@@ -393,7 +400,7 @@ function Relay.buildPendingRelay( world, playerId, freeSheep )
 
     -- STEP 2: Update any relays within distance to ensure their
     --         Receiver is up-to-date as well
-    relay:notifyNearbyRelays()
+    relay:notifyNearbyRelays(relay.position)
 
     -- Set relay's state to STATE_BUILDING. It still needs to be
     -- built before it can be operational. Once its sheep reserve

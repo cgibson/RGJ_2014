@@ -23,7 +23,14 @@ Planet = Class {
         for idx, tile_inner in pairs(tiles) do
             if tile_inner:getRelay() ~= nil and tile_inner:getRelay():canReceiveSheep() then
                 tile_inner:getRelay():receiveSheep(1, self.owner)
-            end                
+                self.sheep = self.sheep - 1
+            end
+            print(tile_inner)
+            print(tile_inner:getShepherds())
+            if tile_inner:getShepherds() ~= nil and tile_inner:getShepherds()[1]:canReceiveSheep() then
+                tile_inner:getShepherds()[1]:receiveSheep(1, self.owner)
+                self.sheep = self.sheep - 1
+            end
         end
 
     end,

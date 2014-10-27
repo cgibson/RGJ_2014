@@ -187,10 +187,17 @@ Shepherd = Class {
         end
     end,
 
+    receiveSheep = function( self, count, owner)
+        self.hp = self.hp + count
+    end,
 
     canReceiveSheep = function( self )
         -- Yea, sure... why not?
-        return true
+        print(self.hp)
+        if self.hp < c.SHEPHERD_HP_MAX then
+            return true
+        end
+        return false
     end
 }
 

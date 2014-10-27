@@ -71,7 +71,9 @@ Constants = {
 
     DIRECTIONS = {"NE", "E", "SE", "SW", "W", "NW" },
 
-    SHEEP_GEN_RATE = 6
+    SHEEP_GEN_RATE = 6,
+    
+    SHEPHERD_HP_MAX = 50
 }
 
 function Constants.getNewId()
