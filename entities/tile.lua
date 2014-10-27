@@ -108,7 +108,7 @@ Tile = Class{
 
     getPlanet = function ( self )
         for id, obj in pairs(self.entities) do
-            if obj.type == c.Entities.TYPE_PLANET or self.type == c.Tiles.TYPE_PLANET_OUTER then
+            if obj.type == c.Entities.TYPE_PLANET then
                 return obj
             end
         end
@@ -140,7 +140,7 @@ Tile = Class{
 
     canReceiveSheep = function( self )
 
-        if self.type == c.Tiles.TYPE_PLANET or self.type == c.Tiles.TYPE_PLANET_OUTER then
+        if self.type == c.Tiles.TYPE_PLANET then
             return true
         else --if self.type == c.Tiles.TYPE_OBSTACLE then
             return false
