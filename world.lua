@@ -151,18 +151,15 @@ World = Class{
         self.planets[#self.planets+1] = planet
 
 
+        tile:addEntity(planet)
+        tile.type = c.Tiles.TYPE_PLANET
+
         -- Find all neighbors and add the planet to them as well
         local tiles = self:getNeighboringTiles(pos)
-        tiles[#tiles+1] = tile
 
         for idx, tile_inner in pairs(tiles) do
-
             -- Make outer planets just that... PLANET_OUTER
-            if tile_inner.position ~= pos then
-                tile_inner.type = c.Tiles.TYPE_PLANET_OUTER
-            else
-                tile_inner.type = c.Tiles.TYPE_PLANET
-            end
+            tile_inner.type = c.Tiles.TYPE_PLANET_OUTER
             tile_inner:addEntity(planet)
         end
     end,
@@ -215,6 +212,16 @@ World = Class{
         -- Draw contents
         HXM.drawRectGridX(self.hexGrid, self.drawHexagon, c.Tiles.TILE_RADIUS, 0, 0, {mode=c.Tiles.HEX_DRAW_CONTENTS})
 
+        -- Draw paths
+        for playerId, data in pairs(self.player_data) do
+            -- Update entities
+            for idx, relay in pairs(data.relays) do
+                relay:drawPath()
+            end
+        end
+
+
+
         -- Draw entities
         for playerId, data in pairs(self.player_data) do
             -- Update entities
@@ -226,6 +233,7 @@ World = Class{
                 data.shepherd:draw()
             end
         end
+
 
         -- Draw planets
         for planetId, planet in pairs(self.planets) do

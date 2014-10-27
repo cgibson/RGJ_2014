@@ -226,6 +226,40 @@ Relay = Class {
     end,
 
 
+    drawPath = function( self )
+
+        if self.target == nil then
+            return
+        end
+
+        local spos = self.position
+        local epos = self.target.position
+
+
+        -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
+        local scoord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, spos.x-1, spos.y-1, 0, 0)
+        local ecoord = HXM.getCoordinates(c.Tiles.TILE_RADIUS, epos.x-1, epos.y-1, 0, 0)
+
+        local minWidth = 1
+        local maxWidth = 15
+
+        local width = math.min(maxWidth, math.max(minWidth, self.out_buffer / 50))
+
+        love.graphics.setLineWidth(width)
+
+        if width < 3 then
+            love.graphics.setColor(180,30,30,50)
+        else
+            love.graphics.setColor(255,0,0)
+        end
+
+        love.graphics.line(scoord.x, scoord.y, ecoord.x, ecoord.y)
+
+
+
+
+    end,
+
     draw = function( self )
 
         -- NOTE: must move from 1-indexed to 0-indexed because HexaMoon is stupid
