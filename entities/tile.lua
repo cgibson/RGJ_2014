@@ -29,6 +29,8 @@ Tile = Class{
 		-- Impassable
         if math.random(1,5) == 1 then
             self.type = c.Tiles.TYPE_ASTEROID
+        elseif math.random(1,10) == 1 then
+            self.type = c.Tiles.TYPE_PLANET
         else
             self.type = c.Tiles.TYPE_SPACE
         end
@@ -53,6 +55,8 @@ Tile = Class{
         
         -- Indexed by player id
         self.owner = 0
+        
+        self.sheep = 0
 
         self.entities = {}
     end,
@@ -65,6 +69,9 @@ Tile = Class{
             elseif self.owner ~= 0 then self.color = c.Colors.HEX_YELLOW
             else self.color = c.Colors.HEX_GREY
             end
+        end
+        if self.type == c.Tiles.TYPE_PLANET then
+            self.sheep = self.sheep + 6
         end
     end,
     
@@ -156,6 +163,8 @@ function Tile:draw(x, y)
     if self.type == c.Tiles.TYPE_PLANET then
         love.graphics.setColor(240, 240, 20)
         love.graphics.circle("fill", x, y, 32)
+        love.graphics.setColor(0,255,0)
+        love.graphics.print("Sheep: " .. self.sheep, x, y)
     end
 end
 
