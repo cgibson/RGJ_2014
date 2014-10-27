@@ -68,7 +68,9 @@ Constants = {
 
     TICK_LENGTH = 1,
 
-    DIRECTIONS = {"NE", "E", "SE", "SW", "W", "NW"}
+    DIRECTIONS = {"NE", "E", "SE", "SW", "W", "NW" },
+
+    SHEEP_GEN_RATE = 6
 }
 
 function Constants.getNewId()

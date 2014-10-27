@@ -11,6 +11,7 @@ c = require "constants"
 Tile = require "entities.tile"
 Relay = require "entities.relay"
 Shepherd = require "entities.shepherd"
+Planet = require "entities.planet"
 
 
 local empty_tile = Tile()
@@ -40,6 +41,7 @@ World = Class{
 
         -- Contains information about each player and the entities they control
         self.player_data = {}
+        self.planets = {}
 
         -- User
         self.player_data[c.PLAYER_1] = {
@@ -70,7 +72,7 @@ World = Class{
             end
         end
 
-        self.hexGrid.grid[1][1].type = c.Tiles.TYPE_PLANET
+        self:createPlanet( Vector(4,4) )
         
         for i = 3, 8 do
             self.hexGrid.grid[i][i] = nil
@@ -135,6 +137,22 @@ World = Class{
     end,
 
 
+    createPlanet = function( self, pos )
+        tile = self:getTile(pos)
+
+        if tile == nil then
+            print ("ERROR: Could not create planet at ", pos)
+            return
+        end
+        -- TODO: Change neighbors to planet as well AND GIVE IT THE SAME PLANET ITEM
+
+        planet = Planet(self, pos)
+        tile.type = c.Tiles.TYPE_PLANET
+        tile:addEntity(planet)
+        self.planets[#self.planets+1] = planet
+    end,
+
+
     getTile = function( self, pos )
         if self:outOfBounds(pos.x, pos.y) then
             return nil
@@ -176,6 +194,11 @@ World = Class{
             if data.shepherd ~= nil then
                 data.shepherd:draw()
             end
+        end
+
+        -- Draw planets
+        for planetId, planet in pairs(self.planets) do
+            planet:draw()
         end
     end,
 
@@ -378,6 +401,11 @@ World = Class{
                 end
                 --Relay.updateSheepingRoutes(data.relays)
             end
+        end
+
+        -- Draw planets
+        for planetId, planet in pairs(self.planets) do
+            planet:update( dt )
         end
     end,
 

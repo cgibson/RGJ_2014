@@ -29,8 +29,6 @@ Tile = Class{
 		-- Impassable
         if math.random(1,5) == 1 then
             self.type = c.Tiles.TYPE_ASTEROID
-        elseif math.random(1,10) == 1 then
-            self.type = c.Tiles.TYPE_PLANET
         else
             self.type = c.Tiles.TYPE_SPACE
         end
@@ -108,9 +106,12 @@ Tile = Class{
 
 
     getPlanet = function ( self )
-        if self.type == c.Tiles.TYPE_PLANET then
-            return self
+        for id, obj in pairs(self.entities) do
+            if obj.type == c.Entities.TYPE_PLANET then
+                return obj
+            end
         end
+
         return nil
     end,
 
@@ -160,12 +161,7 @@ Tile = Class{
 }
 
 function Tile:draw(x, y)
-    if self.type == c.Tiles.TYPE_PLANET then
-        love.graphics.setColor(240, 240, 20)
-        love.graphics.circle("fill", x, y, 32)
-        love.graphics.setColor(0,255,0)
-        love.graphics.print("Sheep: " .. self.sheep, x, y)
-    end
+
 end
 
 function Tile:getWeight( playerId , retreat)

@@ -95,7 +95,7 @@ Relay = Class {
         -- TODO: this
 
         -- Send your buffer to your target
-        self.target.buffer = self.target.buffer + self.out_buffer
+        self.target:receiveSheep(self.out_buffer)
         self.out_buffer = 0
     end,
 
@@ -134,6 +134,12 @@ Relay = Class {
 
         return true
 
+    end,
+
+
+    receiveSheep = function( self, count, owner)
+        -- TODO: handle teams
+        self.buffer = self.buffer + count
     end,
 
 
